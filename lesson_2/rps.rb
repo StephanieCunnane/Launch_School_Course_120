@@ -1,5 +1,12 @@
 class Move
-  VALUES = ['rock', 'paper', 'scissors']
+  VALUES = {
+    'rock'     => 'rock',
+    'r'        => 'rock',
+    'paper'    => 'paper',
+    'p'        => 'paper',
+    'scissors' => 'scissors',
+    's'        => 'scissors'
+  }
 
   def initialize(value)
     @value = value
@@ -47,13 +54,14 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Please choose rock, paper or scissors:"
-      choice = gets.chomp
       puts
-      break if Move::VALUES.include?(choice)
+      puts "Please choose rock, paper or scissors:"
+      choice = gets.chomp.downcase
+      puts
+      break if Move::VALUES.keys.include?(choice)
       puts "Sorry, invalid choice."
     end
-    self.move = Move.new(choice)
+    self.move = Move.new(Move::VALUES[choice])
   end
 
   private
@@ -63,16 +71,16 @@ class Human < Player
     loop do
       puts "What's your name?"
       n = gets.chomp
-      break unless n.empty?
+      break unless n.gsub(/\s+/, '').empty?
       puts "Sorry, must enter a value."
     end
-    self.name = n
+    self.name = n.strip
   end
 end
 
 class Computer < Player
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    self.move = Move.new(Move::VALUES.values.sample)
   end
 
   private
@@ -88,13 +96,13 @@ class RPSGame
   attr_accessor :human, :computer, :round_winner
 
   def initialize
+    display_welcome_message
     @human = Human.new
     @computer = Computer.new
     @round_winner = nil
   end
 
   def play
-    display_welcome_message
     loop do
       human.choose
       computer.choose
@@ -112,7 +120,6 @@ class RPSGame
   private
 
   def display_welcome_message
-    puts
     puts "****************************************************"
     puts "Welcome to Rock, Paper, Scissors!"
     puts "The first player to 10 points is the overall winner."
@@ -134,7 +141,7 @@ class RPSGame
 
   def display_round_wrapup
     puts "#{human.name} chose #{human.move}, " \
-          "#{computer.name} chose #{computer.move}."
+         "#{computer.name} chose #{computer.move}."
 
     if round_winner
       puts "#{round_winner.name} won this round!"
@@ -168,10 +175,10 @@ class RPSGame
     loop do
       puts "Would you like to play again? (y/n)"
       answer = gets.chomp.downcase
-      break if ['y', 'n'].include?(answer)
+      break if ['y', 'n', 'yes', 'no'].include?(answer)
       puts "Sorry, must be y or n."
     end
-    answer == 'y'
+    ['y', 'yes'].include?(answer)
   end
 
   def clear_screen
