@@ -35,16 +35,21 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :score
 
   def initialize
+    @score = 0
     set_name
+  end
+
+  def add_point
+    self.score += 1
   end
 end
 
 class Human < Player
   def set_name
-    n = ''
+    n = ""
     loop do
       puts "What's your name?"
       n = gets.chomp
@@ -59,6 +64,7 @@ class Human < Player
     loop do
       puts "Please choose rock, paper or scissors:"
       choice = gets.chomp
+      puts
       break if Move::VALUES.include?(choice)
       puts "Sorry, invalid choice."
     end
@@ -77,33 +83,65 @@ class Computer < Player
 end
 
 class RPSGame
-  attr_accessor :human, :computer
+  WINNING_SCORE = 10
+
+  attr_accessor :human, :computer, :round_winner
 
   def initialize
     @human = Human.new
     @computer = Computer.new
+    @round_winner = nil
   end
 
   def display_welcome_message
+    puts
+    puts "****************************************************"
     puts "Welcome to Rock, Paper, Scissors!"
+    puts "The first player to 10 points is the overall winner."
+    puts "Good luck!!"
+    puts "****************************************************"
+    puts
   end
 
-  def display_goodbye_message
-    puts "Thanks for playing Rock, Paper, Scissors. Goodbye!"
+  def determine_round_winner
+    self.round_winner = nil
+    self.round_winner = human if human.move > computer.move
+    self.round_winner = computer if computer.move > human.move
   end
 
-  def display_moves
-    puts "#{human.name} chose #{human.move}."
-    puts "#{computer.name} chose #{computer.move}."
+  def add_point
+    human.score += 1 if round_winner == human
+    computer.score += 1 if round_winner == computer
   end
 
-  def display_winner
-    if human.move > computer.move
-      puts "#{human.name} won!"
-    elsif human.move < computer.move
-      puts "#{computer.name} won!"
+  def display_round_wrapup
+    puts "#{human.name} chose #{human.move}, " \
+          "#{computer.name} chose #{computer.move}."
+
+    if round_winner
+      puts "#{round_winner.name} won this round!"
     else
       puts "It's a tie!"
+    end
+  end
+
+  def display_score
+    puts
+    puts "Current score"
+    puts "#{human.name}: #{human.score}"
+    puts "#{computer.name}: #{computer.score}"
+    puts
+  end
+
+  def overall_winner?
+    human.score == WINNING_SCORE || computer.score == WINNING_SCORE
+  end
+
+  def display_game_winner
+    if human.score > computer.score
+      puts "#{human.name} is the overall winner!"
+    else
+      puts "#{computer.name} is the overall winner!"
     end
   end
 
@@ -118,14 +156,26 @@ class RPSGame
     answer == 'y'
   end
 
+  def clear_screen
+    system('clear') || system('cls')
+  end
+
+  def display_goodbye_message
+    puts "Thanks for playing Rock, Paper, Scissors. Goodbye!"
+  end
+
   def play
     display_welcome_message
     loop do
       human.choose
       computer.choose
-      display_moves
-      display_winner
-      break unless play_again?
+      determine_round_winner
+      add_point
+      display_round_wrapup
+      display_score
+      display_game_winner if overall_winner?
+      break if overall_winner? || !play_again?
+      clear_screen
     end
     display_goodbye_message
   end
