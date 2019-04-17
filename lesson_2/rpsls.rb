@@ -1,3 +1,6 @@
+class History
+end
+
 class Move
   VALUES = {
     'rock'     => 'rock',
@@ -82,7 +85,7 @@ class Computer < Player
   end
 end
 
-class RPSGame
+class RPSLSGame
   WINNING_SCORE = 10
 
   attr_accessor :human, :computer, :round_winner
@@ -114,7 +117,7 @@ class RPSGame
 
   def display_welcome_message
     puts "****************************************************"
-    puts "Welcome to Rock, Paper, Scissors!"
+    puts "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
     puts "The first player to 10 points is the overall winner."
     puts "Good luck!!"
     puts "****************************************************"
@@ -179,8 +182,8 @@ class RPSGame
   end
 
   def display_goodbye_message
-    puts "Thanks for playing Rock, Paper, Scissors. Goodbye!"
+    puts "Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!"
   end
 end
 
-RPSGame.new.play
+RPSLSGame.new.play
