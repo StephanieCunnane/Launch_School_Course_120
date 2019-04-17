@@ -41,24 +41,9 @@ class Player
     @score = 0
     set_name
   end
-
-  def add_point
-    self.score += 1
-  end
 end
 
 class Human < Player
-  def set_name
-    n = ""
-    loop do
-      puts "What's your name?"
-      n = gets.chomp
-      break unless n.empty?
-      puts "Sorry, must enter a value."
-    end
-    self.name = n
-  end
-
   def choose
     choice = nil
     loop do
@@ -70,15 +55,30 @@ class Human < Player
     end
     self.move = Move.new(choice)
   end
+
+  private
+
+  def set_name
+    n = ""
+    loop do
+      puts "What's your name?"
+      n = gets.chomp
+      break unless n.empty?
+      puts "Sorry, must enter a value."
+    end
+    self.name = n
+  end
 end
 
 class Computer < Player
-  def set_name
-    self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
-  end
-
   def choose
     self.move = Move.new(Move::VALUES.sample)
+  end
+
+  private
+
+  def set_name
+    self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
   end
 end
 
@@ -92,6 +92,24 @@ class RPSGame
     @computer = Computer.new
     @round_winner = nil
   end
+
+  def play
+    display_welcome_message
+    loop do
+      human.choose
+      computer.choose
+      determine_round_winner
+      add_point
+      display_round_wrapup
+      display_score
+      display_game_winner if overall_winner?
+      break if overall_winner? || !play_again?
+      clear_screen
+    end
+    display_goodbye_message
+  end
+
+  private
 
   def display_welcome_message
     puts
@@ -162,22 +180,6 @@ class RPSGame
 
   def display_goodbye_message
     puts "Thanks for playing Rock, Paper, Scissors. Goodbye!"
-  end
-
-  def play
-    display_welcome_message
-    loop do
-      human.choose
-      computer.choose
-      determine_round_winner
-      add_point
-      display_round_wrapup
-      display_score
-      display_game_winner if overall_winner?
-      break if overall_winner? || !play_again?
-      clear_screen
-    end
-    display_goodbye_message
   end
 end
 
