@@ -5,35 +5,27 @@ class Move
     'paper'    => 'paper',
     'p'        => 'paper',
     'scissors' => 'scissors',
-    's'        => 'scissors'
+    'sc'       => 'scissors',
+    'lizard'   => 'lizard',
+    'l'        => 'lizard',
+    'spock'    => 'spock',
+    'sp'       => 'spock'
+  }
+
+  WINNING_MOVES = {
+    'rock'     => ['scissors', 'lizard'],
+    'paper'    => ['rock', 'spock'],
+    'scissors' => ['lizard', 'paper'],
+    'lizard'   => ['paper', 'spock'],
+    'spock'    => ['scissors', 'rock']
   }
 
   def initialize(value)
     @value = value
   end
 
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
-  def scissors?
-    @value == 'scissors'
-  end
-
   def >(other_move)
-    (rock? && other_move.scissors?) ||
-      (paper? && other_move.rock?) ||
-      (scissors? && other_move.paper?)
-  end
-
-  def <(other_move)
-    (rock? && other_move.paper?) ||
-      (paper? && other_move.scissors?) ||
-      (scissors? && other_move.rock?)
+    WINNING_MOVES[@value].include?(other_move.to_s)
   end
 
   def to_s
@@ -55,7 +47,7 @@ class Human < Player
     choice = nil
     loop do
       puts
-      puts "Please choose rock, paper or scissors:"
+      puts "Please choose rock, paper, scissors, lizard or spock:"
       choice = gets.chomp.downcase
       puts
       break if Move::VALUES.keys.include?(choice)
@@ -108,11 +100,12 @@ class RPSGame
       computer.choose
       determine_round_winner
       add_point
+      clear_screen
       display_round_wrapup
       display_score
       display_game_winner if overall_winner?
-      break if overall_winner? || !play_again?
-      clear_screen
+      break if overall_winner?
+      play_again? if overall_winner?
     end
     display_goodbye_message
   end
