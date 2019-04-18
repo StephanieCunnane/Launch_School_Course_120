@@ -1,3 +1,66 @@
+module Displayable
+  def display_welcome_message
+    puts "****************************************************"
+    puts "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
+    puts "The first player to #{RPSLSGame::WINNING_SCORE} " \
+          "points is the overall winner."
+    puts "Good luck!!"
+    puts "****************************************************"
+    puts
+  end
+
+  def display_moves
+    puts "#{human.name} chose #{human.move}, " \
+         "#{computer.name} chose #{computer.move}."
+  end
+
+  def display_round_winner
+    if round_winner
+      puts "#{round_winner.name} won this round!"
+    else
+      puts "It's a tie!"
+    end
+  end
+
+  def display_score
+    puts
+    puts "Current score"
+    puts "#{human.name}: #{human.score}"
+    puts "#{computer.name}: #{computer.score}"
+    puts
+  end
+
+  def display_history
+    puts
+    puts "Moves so far:"
+    summarize_moves
+    puts
+  end
+
+  def display_round_wrapup
+    display_moves
+    display_round_winner
+    display_score
+    display_history
+  end
+
+  def display_game_winner
+    if human.score > computer.score
+      puts "#{human.name} is the overall winner!"
+    else
+      puts "#{computer.name} is the overall winner!"
+    end
+  end
+
+  def display_goodbye_message
+    puts "Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!"
+  end
+
+  def clear_screen
+    system('clear') || system('cls')
+  end
+end
+
 class Move
   VALUES = {
     'rock'     => 'rock',
@@ -56,7 +119,6 @@ class Human < Player
     end
     self.move = Move.new(Move::VALUES[choice])
     move_history << move
-    p move_history
   end
 
   private
@@ -86,16 +148,26 @@ class Computer < Player
   end
 end
 
+class GameHistory
+  def initialize
+    @history = {}
+  end
+end
+
 class RPSLSGame
+  include Displayable
+
   WINNING_SCORE = 5
 
-  attr_accessor :human, :computer, :round_winner
+  attr_accessor :human, :computer, :rounds_completed, :round_winner
 
   def initialize
     display_welcome_message
     @human = Human.new
     @computer = Computer.new
+    @rounds_completed = 0
     @round_winner = nil
+    @history = GameHistory.new
   end
 
   def play
@@ -105,6 +177,7 @@ class RPSLSGame
       determine_round_winner
       add_point
       clear_screen
+      increment_rounds_completed
       display_round_wrapup
       display_game_winner if overall_winner?
       break if overall_winner?
@@ -114,15 +187,6 @@ class RPSLSGame
   end
 
   private
-
-  def display_welcome_message
-    puts "****************************************************"
-    puts "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
-    puts "The first player to #{WINNING_SCORE} points is the overall winner."
-    puts "Good luck!!"
-    puts "****************************************************"
-    puts
-  end
 
   def determine_round_winner
     self.round_winner = nil
@@ -135,25 +199,8 @@ class RPSLSGame
     computer.score += 1 if round_winner == computer
   end
 
-  def display_moves
-    puts "#{human.name} chose #{human.move}, " \
-         "#{computer.name} chose #{computer.move}."
-  end
-
-  def display_round_winner
-    if round_winner
-      puts "#{round_winner.name} won this round!"
-    else
-      puts "It's a tie!"
-    end
-  end
-
-  def display_score
-    puts
-    puts "Current score"
-    puts "#{human.name}: #{human.score}"
-    puts "#{computer.name}: #{computer.score}"
-    puts
+  def increment_rounds_completed
+    self.rounds_completed += 1
   end
 
   def summarize_moves
@@ -163,30 +210,8 @@ class RPSLSGame
     end
   end
 
-  def display_history
-    puts
-    puts "Moves so far:"
-    summarize_moves
-    puts
-  end
-
-  def display_round_wrapup
-    display_moves
-    display_round_winner
-    display_score
-    display_history
-  end
-
   def overall_winner?
     human.score == WINNING_SCORE || computer.score == WINNING_SCORE
-  end
-
-  def display_game_winner
-    if human.score > computer.score
-      puts "#{human.name} is the overall winner!"
-    else
-      puts "#{computer.name} is the overall winner!"
-    end
   end
 
   def play_again?
@@ -198,14 +223,6 @@ class RPSLSGame
       puts "Sorry, must be y or n."
     end
     ['y', 'yes'].include?(answer)
-  end
-
-  def clear_screen
-    system('clear') || system('cls')
-  end
-
-  def display_goodbye_message
-    puts "Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!"
   end
 end
 
