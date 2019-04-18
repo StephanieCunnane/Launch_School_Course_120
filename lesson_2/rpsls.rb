@@ -1,6 +1,3 @@
-class History
-end
-
 class Move
   VALUES = {
     'rock'     => 'rock',
@@ -37,10 +34,11 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name, :score
+  attr_accessor :move, :name, :score, :move_history
 
   def initialize
     @score = 0
+    @move_history = []
     set_name
   end
 end
@@ -57,6 +55,8 @@ class Human < Player
       puts "Sorry, invalid choice."
     end
     self.move = Move.new(Move::VALUES[choice])
+    move_history << move
+    p move_history
   end
 
   private
@@ -76,6 +76,7 @@ end
 class Computer < Player
   def choose
     self.move = Move.new(Move::VALUES.values.sample)
+    move_history << move
   end
 
   private
@@ -86,7 +87,7 @@ class Computer < Player
 end
 
 class RPSLSGame
-  WINNING_SCORE = 10
+  WINNING_SCORE = 5
 
   attr_accessor :human, :computer, :round_winner
 
@@ -105,7 +106,6 @@ class RPSLSGame
       add_point
       clear_screen
       display_round_wrapup
-      display_score
       display_game_winner if overall_winner?
       break if overall_winner?
       play_again? if overall_winner?
@@ -118,7 +118,7 @@ class RPSLSGame
   def display_welcome_message
     puts "****************************************************"
     puts "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
-    puts "The first player to 10 points is the overall winner."
+    puts "The first player to #{WINNING_SCORE} points is the overall winner."
     puts "Good luck!!"
     puts "****************************************************"
     puts
@@ -135,10 +135,12 @@ class RPSLSGame
     computer.score += 1 if round_winner == computer
   end
 
-  def display_round_wrapup
+  def display_moves
     puts "#{human.name} chose #{human.move}, " \
          "#{computer.name} chose #{computer.move}."
+  end
 
+  def display_round_winner
     if round_winner
       puts "#{round_winner.name} won this round!"
     else
@@ -152,6 +154,27 @@ class RPSLSGame
     puts "#{human.name}: #{human.score}"
     puts "#{computer.name}: #{computer.score}"
     puts
+  end
+
+  def summarize_moves
+    1.upto(human.move_history.size) do |round|
+      puts "#{round}. #{human.name}: #{human.move_history[round - 1]} | " \
+           "#{computer.name}: #{computer.move_history[round - 1]}"
+    end
+  end
+
+  def display_history
+    puts
+    puts "Moves so far:"
+    summarize_moves
+    puts
+  end
+
+  def display_round_wrapup
+    display_moves
+    display_round_winner
+    display_score
+    display_history
   end
 
   def overall_winner?
