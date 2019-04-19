@@ -109,11 +109,15 @@ class Player
   def initialize
     @score = 0
     @move_history = []
-    set_name
   end
 end
 
 class Human < Player
+  def initialize
+    super
+    set_name
+  end
+
   def choose
     choice = nil
     loop do
@@ -149,10 +153,6 @@ class Computer < Player
   end
 
   private
-
-  def set_name
-    self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
-  end
 
   def last_two_moves_same?
     move_history.size >= 2 &&
@@ -193,17 +193,65 @@ class Computer < Player
   end
 end
 
+class R2D2 < Computer
+  def initialize
+    @name = 'R2D2'
+    super
+  end
+
+  def apply_weighting
+    self.move = weighted_sample([1, 0, 0, 0, 0])
+  end
+end
+
+class Hal < Computer
+  def initialize
+    @name = 'Hal'
+    super
+  end
+
+  def apply_weighting
+    self.move = weighted_sample([0, 0, 0, 0, 1])
+  end
+end
+
+class Chappie < Computer
+  def initialize
+    @name = 'Chappie'
+    super
+  end
+
+  def apply_weighting
+    self.move = weighted_sample([0, 0, 0, 0.5, 0.5])
+  end
+end
+
+class Sonny < Computer
+  def initialize
+    @name = 'Sonny'
+    super
+  end
+end
+
+class Number5 < Computer
+  def initialize
+    @name = 'Number 5'
+    super
+  end
+end
+
 class RPSLSGame
   include Displayable
 
   WINNING_SCORE = 10
+  ROBOT_PLAYERS = [R2D2.new, Hal.new, Chappie.new, Sonny.new, Number5.new]
 
   attr_accessor :human, :computer, :rounds_completed, :round_winner, :history
 
   def initialize
     display_welcome_message
     @human = Human.new
-    @computer = Computer.new
+    @computer = ROBOT_PLAYERS.sample
     @rounds_completed = 0
     @round_winner = nil
   end
