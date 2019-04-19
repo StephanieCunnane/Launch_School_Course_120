@@ -177,8 +177,8 @@ class Computer < Player
   def weighted_sample(weights)
     pool = []
     element_occurrences = weights.map { |weight| (weight * 100).to_i }
-    temp = element_occurrences.zip(Move::VALUES.values.uniq)
-    temp.each do |occurrences, move_value|
+    pairs = element_occurrences.zip(Move::VALUES.values.uniq)
+    pairs.each do |occurrences, move_value|
       occurrences.times { pool << Move.new(move_value) }
     end
     pool.sample
@@ -243,10 +243,10 @@ end
 class RPSLSGame
   include Displayable
 
-  WINNING_SCORE = 10
+  WINNING_SCORE = 5
   ROBOT_PLAYERS = [R2D2.new, Hal.new, Chappie.new, Sonny.new, Number5.new]
 
-  attr_accessor :human, :computer, :rounds_completed, :round_winner, :history
+  attr_accessor :human, :computer, :rounds_completed, :round_winner
 
   def initialize
     display_welcome_message
