@@ -144,7 +144,7 @@ end
 
 class Computer < Player
   def choose
-    self.move = Move.new(Move::VALUES.values.sample)
+    apply_weighting
     move_history << move
   end
 
@@ -153,20 +153,52 @@ class Computer < Player
   def set_name
     self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
   end
-end
 
-class GameHistory
-  def initialize
-    @history = {}
+  def last_two_moves_same?
+    move_history.size >= 2 &&
+      move_history.last(2).map(&:value).uniq.size == 1
+  end
+
+  def apply_weighting
+    last_two_moves_same? ? weighted_choose : unweighted_choose
+  end
+
+  def idx_of_repeated_move
+    Move::VALUES.values.uniq.index(move_history.last.to_s)
+  end
+
+  def build_weights_arr
+    initial_weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+    weights = Array.new(5, (1.0 / (initial_weights.size - 1)))
+    weights[idx_of_repeated_move] = 0
+    weights
+  end
+
+  def weighted_sample(weights)
+    pool = []
+    element_occurrences = weights.map { |weight| (weight * 100).to_i }
+    temp = element_occurrences.zip(Move::VALUES.values.uniq)
+    temp.each do |occurrences, move_value|
+      occurrences.times { pool << Move.new(move_value) }
+    end
+    pool.sample
+  end
+
+  def weighted_choose
+    self.move = weighted_sample(build_weights_arr)
+  end
+
+  def unweighted_choose
+    self.move = Move.new(Move::VALUES.values.sample)
   end
 end
 
 class RPSLSGame
   include Displayable
 
-  WINNING_SCORE = 3
+  WINNING_SCORE = 10
 
-  attr_accessor :human, :computer, :rounds_completed, :round_winner
+  attr_accessor :human, :computer, :rounds_completed, :round_winner, :history
 
   def initialize
     display_welcome_message
@@ -174,7 +206,6 @@ class RPSLSGame
     @computer = Computer.new
     @rounds_completed = 0
     @round_winner = nil
-    @history = GameHistory.new
   end
 
   def play
@@ -194,14 +225,6 @@ class RPSLSGame
   end
 
   private
-
-  def reset
-    self.rounds_completed = 0
-    human.score = 0
-    human.move_history = []
-    computer.score = 0
-    computer.move_history = []
-  end
 
   def determine_round_winner
     self.round_winner = nil
@@ -227,6 +250,14 @@ class RPSLSGame
 
   def overall_winner?
     human.score == WINNING_SCORE || computer.score == WINNING_SCORE
+  end
+
+  def reset
+    self.rounds_completed = 0
+    human.score = 0
+    human.move_history = []
+    computer.score = 0
+    computer.move_history = []
   end
 
   def end_game?
