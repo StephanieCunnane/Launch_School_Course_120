@@ -1,66 +1,6 @@
-module Displayable
-  def display_welcome_message
-    puts "****************************************************"
-    puts "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
-    puts "The first player to #{RPSLSGame::WINNING_SCORE} " \
-         "points is the overall winner."
-    puts "Good luck!!"
-    puts "****************************************************"
-    puts
-  end
-
-  def display_moves
-    prompt("#{human.name} chose #{human.move}, " \
-         "#{computer.name} chose #{computer.move}.")
-  end
-
-  def display_round_winner
-    if round_winner
-      prompt("#{round_winner.name} won this round!")
-    else
-      prompt("It's a tie!")
-    end
-  end
-
-  def display_score
-    puts
-    prompt("Current score")
-    prompt("#{human.name}: #{human.score}")
-    prompt("#{computer.name}: #{computer.score}")
-    puts
-  end
-
-  def display_history
-    prompt("Moves so far:")
-    summarize_moves
-    puts
-  end
-
-  def display_round_wrapup
-    display_moves
-    display_round_winner
-    display_score
-    display_history
-  end
-
-  def display_game_winner
-    if human.score > computer.score
-      puts "#{human.name} is the overall winner!"
-    else
-      puts "#{computer.name} is the overall winner!"
-    end
-  end
-
-  def display_goodbye_message
-    prompt("Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!")
-  end
-
+module Utilities
   def prompt(msg)
     puts "==> #{msg}"
-  end
-
-  def clear_screen
-    system('clear') || system('cls')
   end
 end
 
@@ -102,7 +42,7 @@ class Move
 end
 
 class Player
-  include Displayable
+  include Utilities
 
   attr_accessor :move, :name, :score, :move_history
 
@@ -241,12 +181,10 @@ class Number5 < Computer
 end
 
 class RPSLSGame
-  include Displayable
+  include Utilities
 
   WINNING_SCORE = 5
   ROBOT_PLAYERS = [R2D2.new, Hal.new, Chappie.new, Sonny.new, Number5.new]
-
-  attr_accessor :human, :computer, :rounds_completed, :round_winner
 
   def initialize
     display_welcome_message
@@ -274,6 +212,68 @@ class RPSLSGame
 
   private
 
+  attr_accessor :human, :computer, :rounds_completed, :round_winner
+
+  def display_welcome_message
+    puts "****************************************************"
+    puts "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
+    puts "The first player to #{RPSLSGame::WINNING_SCORE} " \
+         "points is the overall winner."
+    puts "Good luck!!"
+    puts "****************************************************"
+    puts
+  end
+
+  def display_moves
+    prompt("#{human.name} chose #{human.move}, " \
+         "#{computer.name} chose #{computer.move}.")
+  end
+
+  def display_round_winner
+    if round_winner
+      prompt("#{round_winner.name} won this round!")
+    else
+      prompt("It's a tie!")
+    end
+  end
+
+  def display_score
+    puts
+    prompt("Current score")
+    prompt("#{human.name}: #{human.score}")
+    prompt("#{computer.name}: #{computer.score}")
+    puts
+  end
+
+  def display_history
+    prompt("Moves so far:")
+    summarize_moves
+    puts
+  end
+
+  def display_round_wrapup
+    display_moves
+    display_round_winner
+    display_score
+    display_history
+  end
+
+  def display_game_winner
+    if human.score > computer.score
+      puts "#{human.name} is the overall winner!"
+    else
+      puts "#{computer.name} is the overall winner!"
+    end
+  end
+
+  def display_goodbye_message
+    prompt("Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!")
+  end
+
+  def clear_screen
+    system('clear') || system('cls')
+  end
+
   def determine_round_winner
     self.round_winner = nil
     self.round_winner = human if human.move > computer.move
@@ -286,7 +286,7 @@ class RPSLSGame
   end
 
   def increment_rounds_completed
-    self.rounds_completed += 1
+    @rounds_completed += 1
   end
 
   def summarize_moves
