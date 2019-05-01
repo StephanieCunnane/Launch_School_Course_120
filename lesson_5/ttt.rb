@@ -95,6 +95,7 @@ end
 class TTTGame
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
+  FIRST_TO_MOVE = COMPUTER_MARKER
 
   attr_reader :board, :human, :computer
 
@@ -102,6 +103,7 @@ class TTTGame
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
+    @current_marker = FIRST_TO_MOVE
   end
 
   def display_welcome_message
@@ -125,6 +127,10 @@ class TTTGame
     puts ""
   end
 
+  def human_turn?
+    @current_marker == HUMAN_MARKER
+  end
+
   def human_moves
     puts "Choose a square (#{board.unmarked_keys.join(', ')}): "
     square = nil
@@ -139,6 +145,16 @@ class TTTGame
 
   def computer_moves
     board[board.unmarked_keys.sample] = computer.marker
+  end
+
+  def current_player_moves
+    if human_turn?
+      human_moves
+      @current_marker = COMPUTER_MARKER
+    else
+      computer_moves
+      @current_marker = HUMAN_MARKER
+    end
   end
 
   def display_result
@@ -172,6 +188,7 @@ class TTTGame
 
   def reset
     board.reset
+    @current_marker = FIRST_TO_MOVE
     clear
   end
 
@@ -186,16 +203,12 @@ class TTTGame
 
     loop do
       display_board
-
       loop do
-        human_moves
+        current_player_moves
         break if board.someone_won? || board.full?
-
-        computer_moves
-        break if board.someone_won? || board.full?
-
-        clear_screen_and_display_board
+        clear_screen_and_display_board if human_turn?
       end
+
       display_result
       break unless play_again?
       reset
@@ -208,4 +221,3 @@ end
 
 game = TTTGame.new
 game.play
-
