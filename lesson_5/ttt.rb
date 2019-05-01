@@ -39,7 +39,6 @@ class Board
   end
 
   def draw
-    puts ""
     puts "     |     |"
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
     puts "     |     |"
@@ -112,6 +111,7 @@ class TTTGame
 
     loop do
       display_board
+
       loop do
         current_player_moves
         break if board.someone_won? || board.full?
@@ -223,4 +223,3 @@ end
 
 game = TTTGame.new
 game.play
-
