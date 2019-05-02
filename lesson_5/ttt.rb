@@ -38,19 +38,21 @@ class Board
     (1..9).each { |key| @squares[key] = Square.new }
   end
 
+  # rubocop:disable Metrics/AbcSize
   def draw
-    puts "     |     |"
+    puts '     |     |'
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
+    puts '     |     |'
+    puts '-----+-----+-----'
+    puts '     |     |'
     puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
+    puts '     |     |'
+    puts '-----+-----+-----'
+    puts '     |     |'
     puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
-    puts "     |     |"
+    puts '     |     |'
   end
+  # rubocop:enable Metrics/AbcSize
 
   private
 
@@ -92,8 +94,8 @@ class Player
 end
 
 class TTTGame
-  HUMAN_MARKER = "X"
-  COMPUTER_MARKER = "O"
+  HUMAN_MARKER = 'X'
+  COMPUTER_MARKER = 'O'
   FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
@@ -130,12 +132,12 @@ class TTTGame
   private
 
   def display_welcome_message
-    puts "Welcome to Tic Tac Toe!"
-    puts ""
+    puts 'Welcome to Tic Tac Toe!'
+    puts ''
   end
 
   def display_goodbye_message
-    puts "Thanks for playing Tic Tac Toe! Goodbye!"
+    puts 'Thanks for playing Tic Tac Toe! Goodbye!'
   end
 
   def clear_screen_and_display_board
@@ -145,9 +147,9 @@ class TTTGame
 
   def display_board
     puts "You're an #{human.marker}. Computer is an #{computer.marker}."
-    puts ""
+    puts ''
     board.draw
-    puts ""
+    puts ''
   end
 
   def human_turn?
@@ -185,9 +187,9 @@ class TTTGame
 
     case board.winning_marker
     when human.marker
-      puts "You won!"
+      puts 'You won!'
     when computer.marker
-      puts "Computer won!"
+      puts 'Computer won!'
     else
       puts "It's a tie!"
     end
@@ -196,17 +198,17 @@ class TTTGame
   def play_again?
     answer = nil
     loop do
-      puts "Would you like to play again? (y/n)"
+      puts 'Would you like to play again? (y/n)'
       answer = gets.chomp.downcase
       break if %w(y n yes no).include?(answer)
-      puts "Sorry, must be y or n."
+      puts 'Sorry, must be y or n.'
     end
 
     answer == 'y' || answer == 'yes'
   end
 
   def clear
-    system("clear") || system("cls")
+    system('clear') || system('cls')
   end
 
   def reset
@@ -217,7 +219,7 @@ class TTTGame
 
   def display_play_again_message
     puts "Let's play again!"
-    puts ""
+    puts ''
   end
 end
 
