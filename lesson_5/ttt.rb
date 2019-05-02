@@ -16,6 +16,21 @@ class Board
     @squares.keys.select { |key| @squares[key].unmarked? }
   end
 
+  def find_at_risk_square
+    WINNING_LINES.each do |line|
+      human_markers = @squares.select do |k, v|
+        line.include?(k) && v.marker == TTTGame::HUMAN_MARKER
+      end
+      unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
+
+      if human_markers.size == 2 && unmarked_squares.size == 1
+        return (line - human_markers.keys).first
+      end
+    end
+
+    nil
+  end
+
   def full?
     unmarked_keys.empty?
   end
@@ -147,7 +162,7 @@ class TTTGame
   end
 
   def display_goodbye_message
-    puts "And #{game_winner} the overall winner - congratulations!"
+    puts "And #{game_winner} the overall winner - congratulations!" if game_won?
     puts 'Thanks for playing Tic Tac Toe! Goodbye!'
   end
 
@@ -193,7 +208,13 @@ class TTTGame
   end
 
   def computer_moves
-    board[board.unmarked_keys.sample] = computer.marker
+    at_risk_square = board.find_at_risk_square
+
+    if at_risk_square
+      board[at_risk_square] = computer.marker
+    else
+      board[board.unmarked_keys.sample] = computer.marker
+    end
   end
 
   def current_player_moves
