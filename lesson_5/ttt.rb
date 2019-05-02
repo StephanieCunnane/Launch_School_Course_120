@@ -156,8 +156,18 @@ class TTTGame
     @current_marker == HUMAN_MARKER
   end
 
+  def joinor(arr, delimiter=', ', joining_word='or')
+    case arr.size
+    when 1 then arr.first
+    when 2 then arr.join(" #{joining_word} ")
+    else
+      arr[-1] = "#{joining_word} #{arr.last}"
+      arr.join(delimiter)
+    end
+  end
+
   def human_moves
-    puts "Choose a square (#{board.unmarked_keys.join(', ')}): "
+    puts "Choose a square (#{joinor(board.unmarked_keys)}): "
     square = nil
     loop do
       square = gets.chomp.to_i
