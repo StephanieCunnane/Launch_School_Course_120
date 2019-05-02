@@ -1,4 +1,5 @@
 class Board
+  MOST_STRATEGIC_POSITION = 5
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                   [[1, 5, 9], [3, 5, 7]]              # diagonals
@@ -16,7 +17,22 @@ class Board
     @squares.keys.select { |key| @squares[key].unmarked? }
   end
 
-  def find_at_risk_square
+  def offensive_move
+    WINNING_LINES.each do |line|
+      computer_markers = @squares.select do |k, v|
+        line.include?(k) && v.marker == TTTGame::COMPUTER_MARKER
+      end
+      unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
+
+      if computer_markers.size == 2 && unmarked_squares.size == 1
+        return (line - computer_markers.keys).first
+      end
+    end
+
+    nil
+  end
+
+  def defensive_move
     WINNING_LINES.each do |line|
       human_markers = @squares.select do |k, v|
         line.include?(k) && v.marker == TTTGame::HUMAN_MARKER
@@ -29,6 +45,10 @@ class Board
     end
 
     nil
+  end
+
+  def strategic_position
+    MOST_STRATEGIC_POSITION if unmarked_keys.include?(MOST_STRATEGIC_POSITION)
   end
 
   def full?
@@ -208,13 +228,12 @@ class TTTGame
   end
 
   def computer_moves
-    at_risk_square = board.find_at_risk_square
+    position = board.offensive_move ||
+               board.defensive_move ||
+               board.strategic_position ||
+               board.unmarked_keys.sample
 
-    if at_risk_square
-      board[at_risk_square] = computer.marker
-    else
-      board[board.unmarked_keys.sample] = computer.marker
-    end
+    board[position] = computer.marker
   end
 
   def current_player_moves
