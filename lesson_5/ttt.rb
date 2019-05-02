@@ -87,9 +87,11 @@ end
 
 class Player
   attr_reader :marker
+  attr_accessor :score
 
   def initialize(marker)
     @marker = marker
+    @score = 0
   end
 end
 
@@ -97,6 +99,7 @@ class TTTGame
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
   FIRST_TO_MOVE = HUMAN_MARKER
+  WINNING_SCORE = 3
 
   attr_reader :board, :human, :computer
 
@@ -105,12 +108,10 @@ class TTTGame
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
+    prepare_screen
   end
 
   def play
-    clear
-    display_welcome_message
-
     loop do
       display_board
 
@@ -120,8 +121,8 @@ class TTTGame
         clear_screen_and_display_board if human_turn?
       end
 
-      display_result
-      break unless play_again?
+      round_wrapup
+      break if game_won? || !play_again?
       reset
       display_play_again_message
     end
@@ -131,12 +132,22 @@ class TTTGame
 
   private
 
+  def prepare_screen
+    clear
+    display_welcome_message
+  end
+
   def display_welcome_message
-    puts 'Welcome to Tic Tac Toe!'
-    puts ''
+    puts "***************************************************"
+    puts "Welcome to Tic Tac Toe!"
+    puts "The first player to #{WINNING_SCORE} points is the overall winner."
+    puts "Good luck!!"
+    puts "***************************************************"
+    puts
   end
 
   def display_goodbye_message
+    puts "And #{game_winner} the overall winner - congratulations!"
     puts 'Thanks for playing Tic Tac Toe! Goodbye!'
   end
 
@@ -147,6 +158,9 @@ class TTTGame
 
   def display_board
     puts "You're an #{human.marker}. Computer is an #{computer.marker}."
+    puts "The current score is:"
+    puts "Human: #{human.score}"
+    puts "Computer: #{computer.score}"
     puts ''
     board.draw
     puts ''
@@ -190,6 +204,24 @@ class TTTGame
       computer_moves
       @current_marker = HUMAN_MARKER
     end
+  end
+
+  def add_point
+    human.score += 1 if board.winning_marker == HUMAN_MARKER
+    computer.score += 1 if board.winning_marker == COMPUTER_MARKER
+  end
+
+  def game_won?
+    human.score == WINNING_SCORE || computer.score == WINNING_SCORE
+  end
+
+  def game_winner
+    human.score > computer.score ? 'you are' : 'computer is'
+  end
+
+  def round_wrapup
+    add_point
+    display_result
   end
 
   def display_result
