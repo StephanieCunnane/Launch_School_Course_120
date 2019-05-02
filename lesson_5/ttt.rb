@@ -133,7 +133,7 @@ end
 class TTTGame
   HUMAN_MARKER = 'X'
   COMPUTER_MARKER = 'O'
-  FIRST_TO_MOVE = HUMAN_MARKER
+  FIRST_MOVER = 'choose'
   WINNING_SCORE = 3
 
   attr_reader :board, :human, :computer
@@ -142,8 +142,8 @@ class TTTGame
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
-    @current_marker = FIRST_TO_MOVE
-    prepare_screen
+    @current_marker = FIRST_MOVER
+    prepare_game
   end
 
   def play
@@ -167,9 +167,10 @@ class TTTGame
 
   private
 
-  def prepare_screen
+  def prepare_game
     clear
     display_welcome_message
+    determine_first_mover if FIRST_MOVER == 'choose'
   end
 
   def display_welcome_message
@@ -179,6 +180,24 @@ class TTTGame
     puts "Good luck!!"
     puts "***************************************************"
     puts
+  end
+
+  def user_first_mover_choice
+    loop do
+      puts "Who should go first? ((m)e, (c)omputer, or (e)ither)"
+      answer = gets.chomp.downcase
+      return answer if %w(m me c computer e either).include?(answer)
+      puts "Sorry, that's an invalid answer."
+    end
+  end
+
+  def determine_first_mover
+    answer = user_first_mover_choice
+    @current_marker = case answer
+                      when 'm', 'me' then HUMAN_MARKER
+                      when 'c', 'computer' then COMPUTER_MARKER
+                      else [HUMAN_MARKER, COMPUTER_MARKER].sample
+                      end
   end
 
   def display_goodbye_message
@@ -295,7 +314,7 @@ class TTTGame
 
   def reset
     board.reset
-    @current_marker = FIRST_TO_MOVE
+    @current_marker = FIRST_MOVER
     clear
   end
 
