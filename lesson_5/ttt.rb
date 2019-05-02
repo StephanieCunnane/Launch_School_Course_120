@@ -228,12 +228,12 @@ class TTTGame
   end
 
   def computer_moves
-    position = board.offensive_move ||
-               board.defensive_move ||
-               board.strategic_position ||
-               board.unmarked_keys.sample
+    square = board.offensive_move ||
+             board.defensive_move ||
+             board.strategic_position ||
+             board.unmarked_keys.sample
 
-    board[position] = computer.marker
+    board[square] = computer.marker
   end
 
   def current_player_moves
