@@ -136,6 +136,8 @@ class Human < Player
     super
   end
 
+  private
+
   def choose_user_name
     loop do
       puts "What's your name?"
