@@ -147,7 +147,7 @@ class Human < Player
       puts "What's your name?"
       name = gets.chomp
       puts ''
-      return name unless name.match?(/^\s+$/)
+      return name.strip unless name.match?(/^\s+$/)
       puts "Sorry, please enter at least one non-whitespace character."
     end
   end
@@ -379,5 +379,4 @@ class TTTGame
   end
 end
 
-game = TTTGame.new
-game.play
+TTTGame.new.play
