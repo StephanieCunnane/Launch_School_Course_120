@@ -17,30 +17,30 @@ class Board
     @squares.keys.select { |key| @squares[key].unmarked? }
   end
 
-  def offensive_move
+  def offensive_move(marker)
     WINNING_LINES.each do |line|
-      computer_markers = @squares.select do |k, v|
-        line.include?(k) && v.marker == TTTGame::COMPUTER_MARKER
+      my_markers = @squares.select do |k, v|
+        line.include?(k) && v.marker == marker
       end
       unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
 
-      if computer_markers.size == 2 && unmarked_squares.size == 1
-        return (line - computer_markers.keys).first
+      if my_markers.size == 2 && unmarked_squares.size == 1
+        return (line - my_markers.keys).first
       end
     end
 
     nil
   end
 
-  def defensive_move
+  def defensive_move(marker)
     WINNING_LINES.each do |line|
-      human_markers = @squares.select do |k, v|
-        line.include?(k) && v.marker == TTTGame::HUMAN_MARKER
+      opponent_markers = @squares.select do |k, v|
+        line.include?(k) && v.marker == marker
       end
       unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
 
-      if human_markers.size == 2 && unmarked_squares.size == 1
-        return (line - human_markers.keys).first
+      if opponent_markers.size == 2 && unmarked_squares.size == 1
+        return (line - opponent_markers.keys).first
       end
     end
 
@@ -107,16 +107,16 @@ class Square
     @marker = marker
   end
 
-  def to_s
-    @marker
-  end
-
   def marked?
     marker != INITIAL_MARKER
   end
 
   def unmarked?
     marker == INITIAL_MARKER
+  end
+
+  def to_s
+    @marker
   end
 end
 
@@ -198,6 +198,7 @@ class TTTGame
                       when 'c', 'computer' then COMPUTER_MARKER
                       else [HUMAN_MARKER, COMPUTER_MARKER].sample
                       end
+    @initial_current_marker = @current_marker
   end
 
   def display_goodbye_message
@@ -211,7 +212,7 @@ class TTTGame
   end
 
   def display_board
-    puts "You're an #{human.marker}. Computer is an #{computer.marker}."
+    puts "You're #{human.marker}. Computer is #{computer.marker}."
     puts "The current score is:"
     puts "Human: #{human.score}"
     puts "Computer: #{computer.score}"
@@ -247,8 +248,8 @@ class TTTGame
   end
 
   def computer_moves
-    square = board.offensive_move ||
-             board.defensive_move ||
+    square = board.offensive_move(computer.marker) ||
+             board.defensive_move(human.marker) ||
              board.strategic_position ||
              board.unmarked_keys.sample
 
@@ -314,7 +315,7 @@ class TTTGame
 
   def reset
     board.reset
-    @current_marker = FIRST_MOVER
+    @current_marker = @initial_current_marker
     clear
   end
 
