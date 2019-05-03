@@ -155,10 +155,10 @@ class Human < Player
   def choose_user_marker
     puts "What would you like your marker to be?"
     loop do
-      puts "Choose any single character except 'O' or 'o'."
+      puts "Choose any single character except 'O', 'o' or whitespace."
       answer = gets.chomp
       puts ''
-      return answer if answer.match?(/^[^Oo]{1}$/)
+      return answer if answer.match?(/^[^\sOo]{1}$/)
       puts "Sorry, that's not a valid marker."
     end
   end
