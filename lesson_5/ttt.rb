@@ -19,13 +19,13 @@ class Board
 
   def offensive_move(marker)
     WINNING_LINES.each do |line|
-      my_markers = @squares.select do |k, v|
+      computer_markers = @squares.select do |k, v|
         line.include?(k) && v.marker == marker
       end
       unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
 
-      if my_markers.size == 2 && unmarked_squares.size == 1
-        return (line - my_markers.keys).first
+      if computer_markers.size == 2 && unmarked_squares.size == 1
+        return (line - computer_markers.keys).first
       end
     end
 
@@ -135,25 +135,25 @@ end
 
 class Human < Player
   def initialize
-    @name = choose_user_name
-    @marker = choose_user_marker
+    @name = choose_name
+    @marker = choose_marker
     super
   end
 
   private
 
-  def choose_user_name
+  def choose_name
     loop do
       puts "What's your name?"
       name = gets.chomp
       puts ''
       return name.strip unless name.match?(/^\s+$/)
-      puts "Sorry, please enter at least one non-whitespace character."
+      puts 'Sorry, please enter at least one non-whitespace character.'
     end
   end
 
-  def choose_user_marker
-    puts "What would you like your marker to be?"
+  def choose_marker
+    puts 'What would you like your marker to be?'
     loop do
       puts "Choose any single character except 'O', 'o' or whitespace."
       answer = gets.chomp
@@ -184,7 +184,7 @@ class TTTGame
     prepare_game
     @human = Human.new
     @current_marker = FIRST_MOVER
-    determine_first_mover if FIRST_MOVER == 'choose'
+    establish_first_mover if FIRST_MOVER == 'choose'
   end
 
   def play
@@ -214,26 +214,26 @@ class TTTGame
   end
 
   def display_welcome_message
-    puts "***************************************************"
-    puts "Welcome to Tic Tac Toe!"
+    puts '***************************************************'
+    puts 'Welcome to Tic Tac Toe!'
     puts "Your computer opponent today is #{computer.name}."
     puts "The first player to #{WINNING_SCORE} points is the overall winner."
-    puts "Good luck!!"
-    puts "***************************************************"
-    puts
+    puts 'Good luck!!'
+    puts '***************************************************'
+    puts ''
   end
 
-  def user_first_mover_choice
+  def first_mover_choice
     loop do
-      puts "And who should go first? ((m)e, (c)omputer, or (e)ither)"
+      puts 'And who should go first? ((m)e, (c)omputer, or (e)ither)'
       answer = gets.chomp.downcase
       return answer if %w(m me c computer e either).include?(answer)
       puts "Sorry, that's an invalid answer."
     end
   end
 
-  def determine_first_mover
-    answer = user_first_mover_choice
+  def establish_first_mover
+    answer = first_mover_choice
     @current_marker = case answer
                       when 'm', 'me' then human.marker
                       when 'c', 'computer' then computer.marker
@@ -246,7 +246,9 @@ class TTTGame
     if game_won?
       puts "And #{game_winner} is the overall winner - congratulations!"
     end
-    puts 'Thanks for playing Tic Tac Toe! Goodbye!'
+    puts ""
+    puts "That's enough Tic Tac Toe for now!"
+    puts 'Thanks for playing! Goodbye!'
   end
 
   def clear_screen_and_display_board
@@ -255,14 +257,14 @@ class TTTGame
   end
 
   def display_markers
-    puts ""
+    puts ''
     puts "#{human.name} is #{human.marker}. " \
          "#{computer.name} is #{computer.marker}."
-    puts ""
+    puts ''
   end
 
   def display_score
-    puts "The current score is:"
+    puts 'The current score is:'
     puts "#{human.name}: #{human.score}"
     puts "#{computer.name}: #{computer.score}"
   end
@@ -374,7 +376,7 @@ class TTTGame
   end
 
   def display_play_again_message
-    puts "Let's play again!"
+    puts "And we're back!"
     puts ''
   end
 end
