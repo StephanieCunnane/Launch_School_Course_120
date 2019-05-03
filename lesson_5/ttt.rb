@@ -47,8 +47,12 @@ class Board
     nil
   end
 
-  def strategic_position
+  def strategic_move
     MOST_STRATEGIC_POSITION if unmarked_keys.include?(MOST_STRATEGIC_POSITION)
+  end
+
+  def random_move
+    unmarked_keys.sample
   end
 
   def full?
@@ -300,8 +304,8 @@ class TTTGame
   def computer_moves
     square = board.offensive_move(computer.marker) ||
              board.defensive_move(human.marker) ||
-             board.strategic_position ||
-             board.unmarked_keys.sample
+             board.strategic_move ||
+             board.random_move
 
     board[square] = computer.marker
   end
