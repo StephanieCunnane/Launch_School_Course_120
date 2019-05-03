@@ -124,9 +124,33 @@ class Player
   attr_reader :marker
   attr_accessor :score
 
-  def initialize(marker)
-    @marker = marker
+  def initialize
     @score = 0
+  end
+end
+
+class Human < Player
+  def initialize
+    @marker = choose_user_marker
+    super
+  end
+
+  def choose_user_marker
+    puts "What would you like your marker to be?"
+    loop do
+      puts "Choose any single character except 'O' or 'o'."
+      answer = gets.chomp
+      puts ''
+      return answer if answer.match?(/^[^Oo]{1}$/)
+      puts "Sorry, that's not a valid marker."
+    end
+  end
+end
+
+class Computer < Player
+  def initialize
+    @marker = 'O'
+    super
   end
 end
 
@@ -139,11 +163,12 @@ class TTTGame
   attr_reader :board, :human, :computer
 
   def initialize
-    @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
-    @current_marker = FIRST_MOVER
     prepare_game
+    @board = Board.new
+    @human = Human.new
+    @computer = Computer.new
+    @current_marker = FIRST_MOVER
+    determine_first_mover if FIRST_MOVER == 'choose'
   end
 
   def play
@@ -170,7 +195,6 @@ class TTTGame
   def prepare_game
     clear
     display_welcome_message
-    determine_first_mover if FIRST_MOVER == 'choose'
   end
 
   def display_welcome_message
@@ -184,7 +208,7 @@ class TTTGame
 
   def user_first_mover_choice
     loop do
-      puts "Who should go first? ((m)e, (c)omputer, or (e)ither)"
+      puts "And who should go first? ((m)e, (c)omputer, or (e)ither)"
       answer = gets.chomp.downcase
       return answer if %w(m me c computer e either).include?(answer)
       puts "Sorry, that's an invalid answer."
