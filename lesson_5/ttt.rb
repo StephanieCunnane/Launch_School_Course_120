@@ -131,8 +131,19 @@ end
 
 class Human < Player
   def initialize
+    @name = choose_user_name
     @marker = choose_user_marker
     super
+  end
+
+  def choose_user_name
+    loop do
+      puts "What's your name?"
+      name = gets.chomp
+      puts ''
+      return name unless name.match?(/^\s+$/)
+      puts "Sorry, please enter at least one non-whitespace character."
+    end
   end
 
   def choose_user_marker
@@ -149,8 +160,8 @@ end
 
 class Computer < Player
   def initialize
-    @marker = 'O'
     @name = ['Terminator', 'Bender', 'R2D2'].sample
+    @marker = 'O'
     super
   end
 end
@@ -227,7 +238,9 @@ class TTTGame
   end
 
   def display_goodbye_message
-    puts "And #{game_winner} the overall winner - congratulations!" if game_won?
+    if game_won?
+      puts "And #{game_winner} is the overall winner - congratulations!"
+    end
     puts 'Thanks for playing Tic Tac Toe! Goodbye!'
   end
 
@@ -237,12 +250,15 @@ class TTTGame
   end
 
   def display_markers
-    puts "You're #{human.marker}. #{computer.name} is #{computer.marker}."
+    puts ""
+    puts "#{human.name} is #{human.marker}. " \
+         "#{computer.name} is #{computer.marker}."
+    puts ""
   end
 
   def display_score
     puts "The current score is:"
-    puts "Human: #{human.score}"
+    puts "#{human.name}: #{human.score}"
     puts "#{computer.name}: #{computer.score}"
   end
 
@@ -309,7 +325,7 @@ class TTTGame
   end
 
   def game_winner
-    human.score > computer.score ? 'you are' : "#{computer.name} is"
+    human.score > computer.score ? human.name : computer.name
   end
 
   def round_wrapup
@@ -322,7 +338,7 @@ class TTTGame
 
     case board.winning_marker
     when human.marker
-      puts 'You won!'
+      puts "#{human.name} won!"
     when computer.marker
       puts "#{computer.name} won!"
     else
