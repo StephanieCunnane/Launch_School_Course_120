@@ -167,7 +167,6 @@ class Computer < Player
 end
 
 class TTTGame
-  COMPUTER_MARKER = 'O'
   FIRST_MOVER = 'choose'
   WINNING_SCORE = 3
 
@@ -231,8 +230,8 @@ class TTTGame
     answer = user_first_mover_choice
     @current_marker = case answer
                       when 'm', 'me' then human.marker
-                      when 'c', 'computer' then COMPUTER_MARKER
-                      else [human.marker, COMPUTER_MARKER].sample
+                      when 'c', 'computer' then computer.marker
+                      else [human.marker, computer.marker].sample
                       end
     @initial_current_marker = @current_marker
   end
@@ -308,7 +307,7 @@ class TTTGame
   def current_player_moves
     if human_turn?
       human_moves
-      @current_marker = COMPUTER_MARKER
+      @current_marker = computer.marker
     else
       computer_moves
       @current_marker = human.marker
@@ -317,7 +316,7 @@ class TTTGame
 
   def add_point
     human.score += 1 if board.winning_marker == human.marker
-    computer.score += 1 if board.winning_marker == COMPUTER_MARKER
+    computer.score += 1 if board.winning_marker == computer.marker
   end
 
   def game_won?
