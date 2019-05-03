@@ -121,7 +121,7 @@ class Square
 end
 
 class Player
-  attr_reader :marker
+  attr_reader :marker, :name
   attr_accessor :score
 
   def initialize
@@ -150,6 +150,7 @@ end
 class Computer < Player
   def initialize
     @marker = 'O'
+    @name = ['Terminator', 'Bender', 'R2D2'].sample
     super
   end
 end
@@ -162,10 +163,10 @@ class TTTGame
   attr_reader :board, :human, :computer
 
   def initialize
-    prepare_game
     @board = Board.new
-    @human = Human.new
     @computer = Computer.new
+    prepare_game
+    @human = Human.new
     @current_marker = FIRST_MOVER
     determine_first_mover if FIRST_MOVER == 'choose'
   end
@@ -199,6 +200,7 @@ class TTTGame
   def display_welcome_message
     puts "***************************************************"
     puts "Welcome to Tic Tac Toe!"
+    puts "Your computer opponent today is #{computer.name}."
     puts "The first player to #{WINNING_SCORE} points is the overall winner."
     puts "Good luck!!"
     puts "***************************************************"
@@ -234,11 +236,19 @@ class TTTGame
     display_board
   end
 
-  def display_board
-    puts "You're #{human.marker}. Computer is #{computer.marker}."
+  def display_markers
+    puts "You're #{human.marker}. #{computer.name} is #{computer.marker}."
+  end
+
+  def display_score
     puts "The current score is:"
     puts "Human: #{human.score}"
-    puts "Computer: #{computer.score}"
+    puts "#{computer.name}: #{computer.score}"
+  end
+
+  def display_board
+    display_markers
+    display_score
     puts ''
     board.draw
     puts ''
@@ -299,7 +309,7 @@ class TTTGame
   end
 
   def game_winner
-    human.score > computer.score ? 'you are' : 'computer is'
+    human.score > computer.score ? 'you are' : "#{computer.name} is"
   end
 
   def round_wrapup
@@ -314,7 +324,7 @@ class TTTGame
     when human.marker
       puts 'You won!'
     when computer.marker
-      puts 'Computer won!'
+      puts "#{computer.name} won!"
     else
       puts "It's a tie!"
     end
