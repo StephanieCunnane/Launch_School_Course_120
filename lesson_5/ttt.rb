@@ -279,13 +279,13 @@ class TTTGame
     @current_marker == human.marker
   end
 
-  def joinor(arr, delimiter=', ', joining_word='or')
+  def joinor(arr)
     case arr.size
     when 1 then arr.first
-    when 2 then arr.join(" #{joining_word} ")
+    when 2 then arr.join(" or ")
     else
-      arr[-1] = "#{joining_word} #{arr.last}"
-      arr.join(delimiter)
+      arr[-1] = "or #{arr.last}"
+      arr.join(", ")
     end
   end
 
