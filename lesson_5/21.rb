@@ -10,6 +10,7 @@ module Hand
   end
 
   def busted?
+    total(cards) > 21
   end
 
   def total(cards)
@@ -191,7 +192,7 @@ class Game
         player.display_cards
       end
 
-      break if %w(s stay).include?(choice)
+      break if %w(s stay).include?(choice) || player.busted?
     end
   end
 
