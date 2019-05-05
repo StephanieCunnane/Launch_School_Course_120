@@ -5,13 +5,32 @@ module Hand
       puts " - #{card}"
     end
     puts ''
+    puts "Hand total: #{total(cards)}"
+    puts ''
   end
 
   def busted?
   end
 
-  def total
-    # we need to know about cards to produce some total
+  def total(cards)
+    values = cards.map(&:value)
+
+    sum = 0
+    values.each do |value|
+      sum += if value.match?(/ace/)
+               11
+             elsif value.match?(/(king|queen|jack)/)
+               10
+             else
+               value.to_i
+             end
+    end
+
+    values.count('A').times do
+      sum -= 10 if sum > 21
+    end
+
+    sum
   end
 end
 
@@ -151,6 +170,9 @@ class Game
     player.display_cards
     dealer.display_initial_cards
   end
+
+  #def player_turn
+  #end
 
   def display_goodbye_message
     puts ""
