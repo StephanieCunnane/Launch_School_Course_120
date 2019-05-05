@@ -41,7 +41,6 @@ class Participant
 
   def initialize
     @cards = []
-    @total = 0
   end
 end
 
@@ -145,7 +144,7 @@ class Game
     display_welcome_message
     deal_cards
     display_initial_cards
-    #player_turn
+    player_turn
     #dealer_turn
     #display_result
     display_goodbye_message
@@ -171,8 +170,30 @@ class Game
     dealer.display_initial_cards
   end
 
-  #def player_turn
-  #end
+  def choose_hit_or_stay
+    choice = nil
+    loop do
+      puts 'Would you like to (h)it or (s)tay?'
+      choice = gets.chomp.downcase
+      break if %w(h hit s stay).include?(choice)
+      puts "Sorry, must enter 'h'or 's'."
+    end
+    choice
+  end
+
+  def player_turn
+    loop do
+      choice = choose_hit_or_stay
+
+      if %w(h hit).include?(choice)
+        player.cards << deck.deal_card
+        puts 'You chose to hit!'
+        player.display_cards
+      end
+
+      break if %w(s stay).include?(choice)
+    end
+  end
 
   def display_goodbye_message
     puts ""
