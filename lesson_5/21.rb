@@ -1,4 +1,12 @@
 module Hand
+  def display_cards
+    puts "#{referred_to_as} cards: "
+    cards.each do |card|
+      puts " - #{card}"
+    end
+    puts ''
+  end
+
   def busted?
   end
 
@@ -10,6 +18,8 @@ end
 class Participant
   include Hand
 
+  attr_reader :cards, :referred_to_as
+
   def initialize
     @cards = []
     @total = 0
@@ -17,6 +27,11 @@ class Participant
 end
 
 class Player < Participant
+  def initialize
+    @referred_to_as = 'Your'
+    super
+  end
+
   def hit
   end
 
@@ -25,6 +40,18 @@ class Player < Participant
 end
 
 class Dealer < Participant
+  def initialize
+    @referred_to_as = "Dealer's"
+    super
+  end
+
+  def display_initial_cards
+    puts "Dealer's cards: "
+    puts " - #{cards[0]}"
+    puts ' - ?'
+    puts ''
+  end
+
   def hit
   end
 
@@ -33,6 +60,8 @@ class Dealer < Participant
 end
 
 class Deck
+  attr_reader :cards
+
   def initialize
     @cards = build_deck
   end
@@ -45,8 +74,8 @@ class Deck
     combos.shuffle
   end
 
-  def deal
-    # who deals - the dealer or the deck?
+  def deal_card
+    cards.pop
   end
 end
 
@@ -58,9 +87,34 @@ class Card
     @suit = suit
     @value = value
   end
+
+  def suit
+    case @suit
+    when 'H' then 'hearts'
+    when 'D' then 'diamonds'
+    when 'S' then 'spades'
+    when 'C' then 'clubs'
+    end
+  end
+
+  def value
+    case @value
+    when 'A' then 'ace'
+    when 'K' then 'king'
+    when 'Q' then 'queen'
+    when 'J' then 'jack'
+    else @value
+    end
+  end
+
+  def to_s
+    "the #{value} of #{suit}"
+  end
 end
 
 class Game
+  attr_reader :player, :dealer, :deck
+
   def initialize
     @player = Player.new
     @dealer = Dealer.new
@@ -68,12 +122,49 @@ class Game
   end
 
   def start
-   #deal_cards
-   #display_initial_cards
-   #player_turn
-   #dealer_turn
-   #display_result
+    clear
+    display_welcome_message
+    deal_cards
+    display_initial_cards
+    #player_turn
+    #dealer_turn
+    #display_result
+    display_goodbye_message
+  end
+
+  private
+
+  def clear
+    system('clear') || system('cls')
+  end
+
+  def display_welcome_message
+    puts '***************************************************'
+    puts 'Hello and welcome to 21!'
+    puts "Let's see if you can beat the dealer!"
+    puts 'Good luck!!'
+    puts '***************************************************'
+    puts ''
+  end
+
+  def display_initial_cards
+    player.display_cards
+    dealer.display_initial_cards
+  end
+
+  def display_goodbye_message
+    puts ""
+    puts "That's enough 21 for now!"
+    puts 'Thanks for playing! Goodbye!'
+  end
+
+  def deal_cards
+    2.times do
+      player.cards << deck.deal_card
+      dealer.cards << deck.deal_card
+    end
   end
 end
 
 game = Game.new
+game.start
