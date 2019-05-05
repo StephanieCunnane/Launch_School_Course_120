@@ -17,34 +17,27 @@ class Board
     @squares.keys.select { |key| @squares[key].unmarked? }
   end
 
-  def offensive_move(marker)
+  def find_target_position(marker)
     WINNING_LINES.each do |line|
-      computer_markers = @squares.select do |k, v|
+      markers = @squares.select do |k, v|
         line.include?(k) && v.marker == marker
       end
       unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
 
-      if computer_markers.size == 2 && unmarked_squares.size == 1
-        return (line - computer_markers.keys).first
+      if markers.size == 2 && unmarked_squares.size == 1
+        return (line - markers.keys).first
       end
     end
 
     nil
   end
 
-  def defensive_move(marker)
-    WINNING_LINES.each do |line|
-      opponent_markers = @squares.select do |k, v|
-        line.include?(k) && v.marker == marker
-      end
-      unmarked_squares = @squares.values_at(*line).select(&:unmarked?)
+  def offensive_move(computer_marker)
+    find_target_position(computer_marker)
+  end
 
-      if opponent_markers.size == 2 && unmarked_squares.size == 1
-        return (line - opponent_markers.keys).first
-      end
-    end
-
-    nil
+  def defensive_move(human_marker)
+    find_target_position(human_marker)
   end
 
   def strategic_move
@@ -147,7 +140,7 @@ class Human < Player
       puts "What's your name?"
       name = gets.chomp
       puts ''
-      return name.strip unless name.match?(/^\s+$/)
+      return name.strip unless name.match?(/^\s*$/)
       puts 'Sorry, please enter at least one non-whitespace character.'
     end
   end
