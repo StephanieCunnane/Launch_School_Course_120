@@ -176,8 +176,8 @@ class Game
     puts ''
   end
 
-  def spinning
-    10.times do
+  def display_spinner
+    5.times do
       ["-", "\\", "|", "/"].each do |symbol|
         print symbol
         sleep(0.1)
@@ -188,12 +188,20 @@ class Game
 
   def shuffle_the_deck
     print "Shuffling the deck... "
-    spinning
+    display_spinner
+    puts ''
+    puts ''
+  end
+
+  def display_dealing_cards_message
+    print "Dealing the cards... "
+    display_spinner
     puts ''
     puts ''
   end
 
   def deal_initial_cards
+    display_dealing_cards_message
     2.times do
       player.cards << deck.deal_card
       dealer.cards << deck.deal_card
