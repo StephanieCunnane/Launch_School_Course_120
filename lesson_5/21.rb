@@ -1,5 +1,5 @@
 module Hand
-  def display_cards
+  def display_hand
     puts "#{referred_to_as} cards: "
     cards.each do |card|
       puts " - #{card}"
@@ -55,7 +55,7 @@ class Player < Participant
   def hit(deck)
     cards << deck.deal_card
     puts 'You chose to hit!'
-    display_cards
+    display_hand
   end
 
   def stay
@@ -69,7 +69,7 @@ class Dealer < Participant
     super
   end
 
-  def display_initial_cards
+  def display_initial_hand
     puts "Dealer's cards: "
     puts " - #{cards[0]}"
     puts ' - ?'
@@ -79,7 +79,7 @@ class Dealer < Participant
   def hit(deck)
     cards << deck.deal_card
     puts 'Dealer hits!'
-    display_cards
+    display_hand
   end
 
   def stay
@@ -150,8 +150,8 @@ class Game
 
   def start
     display_welcome_message
+
     loop do
-      clear_screen
       deal_initial_cards
       display_initial_cards
       player_turn
@@ -160,6 +160,7 @@ class Game
       break unless play_again?
       reset
     end
+
     display_goodbye_message
   end
 
@@ -186,8 +187,8 @@ class Game
   end
 
   def display_initial_cards
-    player.display_cards
-    dealer.display_initial_cards
+    player.display_hand
+    dealer.display_initial_hand
   end
 
   def choose_hit_or_stay
@@ -253,6 +254,7 @@ class Game
   end
 
   def reset
+    clear_screen
     player.cards = []
     dealer.cards = []
     self.deck = Deck.new
