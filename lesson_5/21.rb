@@ -38,7 +38,8 @@ end
 class Participant
   include Hand
 
-  attr_reader :cards, :referred_to_as
+  attr_accessor :cards
+  attr_reader :referred_to_as
 
   def initialize
     @cards = []
@@ -149,13 +150,17 @@ class Game
   end
 
   def start
-    clear
     display_welcome_message
-    deal_cards
-    display_initial_cards
-    player_turn
-    dealer_turn unless player.busted?
-    #display_result
+    loop do
+      clear
+      deal_cards
+      display_initial_cards
+      player_turn
+      dealer_turn unless player.busted?
+      display_result
+      break unless play_again?
+      reset
+    end
     display_goodbye_message
   end
 
@@ -210,6 +215,22 @@ class Game
     end
 
     dealer.stay unless dealer.busted?
+  end
+
+  def display_result
+    puts "displaying some results"
+  end
+
+  def play_again?
+    puts '-------------'
+    puts 'Do you want to play again? (y or n)'
+    answer = gets.chomp.downcase
+    answer == 'y' || answer == 'yes'
+  end
+
+  def reset
+    player.cards = []
+    dealer.cards = []
   end
 
   def display_goodbye_message
