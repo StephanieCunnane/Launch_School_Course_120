@@ -217,8 +217,26 @@ class Game
     dealer.stay unless dealer.busted?
   end
 
+  def player_final_score
+    player.total(player.cards)
+  end
+
+  def dealer_final_score
+    dealer.total(dealer.cards)
+  end
+
   def display_result
-    puts "displaying some results"
+    if player.busted?
+      puts 'Player busted -> Dealer wins!'
+    elsif dealer.busted?
+      puts 'Dealer busted -> Player wins!'
+    elsif player_final_score > dealer_final_score
+      puts 'Player is the winner!!'
+    elsif dealer_final_score > player_final_score
+      puts 'Dealer is the winner!!'
+    else
+      puts "It's a tie!"
+    end
   end
 
   def play_again?
