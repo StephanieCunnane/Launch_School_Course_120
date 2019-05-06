@@ -152,6 +152,7 @@ class Game
     display_welcome_message
 
     loop do
+      shuffle_the_deck
       deal_initial_cards
       display_initial_cards
       player_turn
@@ -166,16 +167,29 @@ class Game
 
   private
 
-  def clear_screen
-    system('clear') || system('cls')
-  end
-
   def display_welcome_message
     puts '***************************************************'
     puts 'Hello and welcome to 21!'
     puts "Let's see if you can beat the dealer!"
     puts 'Good luck!!'
     puts '***************************************************'
+    puts ''
+  end
+
+  def spinning
+    10.times do
+      ["-", "\\", "|", "/"].each do |symbol|
+        print symbol
+        sleep(0.1)
+        print "\b"
+      end
+    end
+  end
+
+  def shuffle_the_deck
+    print "Shuffling the deck... "
+    spinning
+    puts ''
     puts ''
   end
 
@@ -251,6 +265,10 @@ class Game
     puts 'Do you want to play again? (y or n)'
     answer = gets.chomp.downcase
     answer == 'y' || answer == 'yes'
+  end
+
+  def clear_screen
+    system('clear') || system('cls')
   end
 
   def reset
