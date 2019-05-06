@@ -96,9 +96,7 @@ class Deck
 
   def build_deck
     combos = Card::SUITS.product(Card::VALUES)
-    combos.map! do |suit, value|
-      Card.new(suit, value)
-    end
+    combos.map! { |suit, value| Card.new(suit, value) }
     combos.shuffle
   end
 
@@ -267,5 +265,4 @@ class Game
   end
 end
 
-game = Game.new
-game.start
+Game.new.start
