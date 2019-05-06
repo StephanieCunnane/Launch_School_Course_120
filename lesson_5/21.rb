@@ -141,7 +141,8 @@ class Card
 end
 
 class Game
-  attr_reader :player, :dealer, :deck
+  attr_accessor :deck
+  attr_reader :player, :dealer
 
   def initialize
     @player = Player.new
@@ -249,6 +250,7 @@ class Game
   def reset
     player.cards = []
     dealer.cards = []
+    self.deck = Deck.new
   end
 
   def display_goodbye_message
