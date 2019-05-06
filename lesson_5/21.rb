@@ -1,4 +1,6 @@
 module Hand
+  BLACKJACK = 21
+
   def display_hand
     puts "#{referred_to_as} cards: "
     cards.each do |card|
@@ -10,7 +12,7 @@ module Hand
   end
 
   def busted?
-    total > 21
+    total > BLACKJACK
   end
 
   def total
@@ -28,7 +30,7 @@ module Hand
     end
 
     values.count('Ace').times do
-      sum -= 10 if sum > 21
+      sum -= 10 if sum > BLACKJACK
     end
 
     sum
@@ -61,9 +63,32 @@ class Player < Participant
   def stay
     puts "You stayed at #{total}."
   end
+
+  def choose_hit_or_stay
+    choice = nil
+    loop do
+      puts 'Would you like to (h)it or (s)tay?'
+      choice = gets.chomp.downcase
+      break if %w(h hit s stay).include?(choice)
+      puts "Sorry, must enter 'h'or 's'."
+    end
+    choice
+  end
+
+  def take_turn(deck)
+    loop do
+      choice = choose_hit_or_stay
+      hit!(deck) if %w(h hit).include?(choice)
+      break if %w(s stay).include?(choice) || busted?
+    end
+
+    stay unless busted?
+  end
 end
 
 class Dealer < Participant
+  DEALER_MIN_SCORE = 17
+
   def initialize
     @referred_to_as = "Dealer's"
     super
@@ -84,6 +109,18 @@ class Dealer < Participant
 
   def stay
     puts "Dealer stayed at #{total}."
+  end
+
+  def take_turn(deck)
+    puts ''
+    puts "Now it's the dealer's turn..."
+
+    loop do
+      break if total >= DEALER_MIN_SCORE
+      hit!(deck)
+    end
+
+    stay unless busted?
   end
 end
 
@@ -155,8 +192,8 @@ class Game
       shuffle_the_deck
       deal_initial_cards
       display_initial_cards
-      player_turn
-      dealer_turn unless player.busted?
+      player.take_turn(deck)
+      dealer.take_turn(deck) unless player.busted?
       display_result
       break unless play_again?
       reset
@@ -174,7 +211,7 @@ class Game
     puts 'Good luck!!'
     puts '***************************************************'
     puts ''
-    sleep(1.5)
+    sleep(1.25)
   end
 
   def display_spinner
@@ -213,39 +250,6 @@ class Game
   def display_initial_cards
     player.display_hand
     dealer.display_initial_hand
-  end
-
-  def choose_hit_or_stay
-    choice = nil
-    loop do
-      puts 'Would you like to (h)it or (s)tay?'
-      choice = gets.chomp.downcase
-      break if %w(h hit s stay).include?(choice)
-      puts "Sorry, must enter 'h'or 's'."
-    end
-    choice
-  end
-
-  def player_turn
-    loop do
-      choice = choose_hit_or_stay
-      player.hit!(deck) if %w(h hit).include?(choice)
-      break if %w(s stay).include?(choice) || player.busted?
-    end
-
-    player.stay unless player.busted?
-  end
-
-  def dealer_turn
-    puts ''
-    puts "Now it's the dealer's turn..."
-
-    loop do
-      break if dealer.total >= 17
-      dealer.hit!(deck)
-    end
-
-    dealer.stay unless dealer.busted?
   end
 
   def player_final_score
