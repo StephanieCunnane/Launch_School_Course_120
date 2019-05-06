@@ -151,8 +151,8 @@ class Game
   def start
     display_welcome_message
     loop do
-      clear
-      deal_cards
+      clear_screen
+      deal_initial_cards
       display_initial_cards
       player_turn
       dealer_turn unless player.busted?
@@ -165,7 +165,7 @@ class Game
 
   private
 
-  def clear
+  def clear_screen
     system('clear') || system('cls')
   end
 
@@ -176,6 +176,13 @@ class Game
     puts 'Good luck!!'
     puts '***************************************************'
     puts ''
+  end
+
+  def deal_initial_cards
+    2.times do
+      player.cards << deck.deal_card
+      dealer.cards << deck.deal_card
+    end
   end
 
   def display_initial_cards
@@ -255,13 +262,6 @@ class Game
     puts ""
     puts "That's enough 21 for now!"
     puts 'Thanks for playing! Goodbye!'
-  end
-
-  def deal_cards
-    2.times do
-      player.cards << deck.deal_card
-      dealer.cards << deck.deal_card
-    end
   end
 end
 
