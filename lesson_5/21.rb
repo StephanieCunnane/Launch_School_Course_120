@@ -18,16 +18,16 @@ module Hand
 
     sum = 0
     values.each do |value|
-      sum += if value.match?(/ace/)
+      sum += if value.match?(/Ace/)
                11
-             elsif value.match?(/(king|queen|jack)/)
+             elsif value.match?(/(King|Queen|Jack)/)
                10
              else
                value.to_i
              end
     end
 
-    values.count('A').times do
+    values.count('Ace').times do
       sum -= 10 if sum > 21
     end
 
@@ -52,7 +52,7 @@ class Player < Participant
     super
   end
 
-  def hit(deck)
+  def hit!(deck)
     cards << deck.deal_card
     puts 'You chose to hit!'
     display_hand
@@ -76,7 +76,7 @@ class Dealer < Participant
     puts ''
   end
 
-  def hit(deck)
+  def hit!(deck)
     cards << deck.deal_card
     puts 'Dealer hits!'
     display_hand
@@ -116,25 +116,25 @@ class Card
 
   def suit
     case @suit
-    when 'H' then 'hearts'
-    when 'D' then 'diamonds'
-    when 'S' then 'spades'
-    when 'C' then 'clubs'
+    when 'H' then 'Hearts'
+    when 'D' then 'Diamonds'
+    when 'S' then 'Spades'
+    when 'C' then 'Clubs'
     end
   end
 
   def value
     case @value
-    when 'A' then 'ace'
-    when 'K' then 'king'
-    when 'Q' then 'queen'
-    when 'J' then 'jack'
+    when 'A' then 'Ace'
+    when 'K' then 'King'
+    when 'Q' then 'Queen'
+    when 'J' then 'Jack'
     else @value
     end
   end
 
   def to_s
-    "the #{value} of #{suit}"
+    "#{value} of #{suit}"
   end
 end
 
@@ -174,6 +174,7 @@ class Game
     puts 'Good luck!!'
     puts '***************************************************'
     puts ''
+    sleep(1.5)
   end
 
   def display_spinner
@@ -202,6 +203,7 @@ class Game
 
   def deal_initial_cards
     display_dealing_cards_message
+
     2.times do
       player.cards << deck.deal_card
       dealer.cards << deck.deal_card
@@ -227,7 +229,7 @@ class Game
   def player_turn
     loop do
       choice = choose_hit_or_stay
-      player.hit(deck) if %w(h hit).include?(choice)
+      player.hit!(deck) if %w(h hit).include?(choice)
       break if %w(s stay).include?(choice) || player.busted?
     end
 
@@ -240,7 +242,7 @@ class Game
 
     loop do
       break if dealer.total >= 17
-      dealer.hit(deck)
+      dealer.hit!(deck)
     end
 
     dealer.stay unless dealer.busted?
