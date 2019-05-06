@@ -51,10 +51,14 @@ class Player < Participant
     super
   end
 
-  def hit
+  def hit(deck)
+    cards << deck.deal_card
+    puts 'You chose to hit!'
+    display_cards
   end
 
   def stay
+    puts "You stayed at #{total(cards)}."
   end
 end
 
@@ -71,10 +75,14 @@ class Dealer < Participant
     puts ''
   end
 
-  def hit
+  def hit(deck)
+    cards << deck.deal_card
+    puts 'Dealer hits!'
+    display_cards
   end
 
   def stay
+    puts "Dealer stayed at #{total(cards)}."
   end
 end
 
@@ -146,7 +154,7 @@ class Game
     deal_cards
     display_initial_cards
     player_turn
-    #dealer_turn
+    dealer_turn unless player.busted?
     #display_result
     display_goodbye_message
   end
@@ -185,15 +193,23 @@ class Game
   def player_turn
     loop do
       choice = choose_hit_or_stay
-
-      if %w(h hit).include?(choice)
-        player.cards << deck.deal_card
-        puts 'You chose to hit!'
-        player.display_cards
-      end
-
+      player.hit(deck) if %w(h hit).include?(choice)
       break if %w(s stay).include?(choice) || player.busted?
     end
+
+    player.stay unless player.busted?
+  end
+
+  def dealer_turn
+    puts ''
+    puts "Now it's the dealer's turn..."
+
+    loop do
+      break if dealer.total(dealer.cards) >= 17
+      dealer.hit(deck)
+    end
+
+    dealer.stay unless dealer.busted?
   end
 
   def display_goodbye_message
