@@ -5,15 +5,15 @@ module Hand
       puts " - #{card}"
     end
     puts ''
-    puts "Hand total: #{total(cards)}"
+    puts "Hand total: #{total}"
     puts ''
   end
 
   def busted?
-    total(cards) > 21
+    total > 21
   end
 
-  def total(cards)
+  def total
     values = cards.map(&:value)
 
     sum = 0
@@ -59,7 +59,7 @@ class Player < Participant
   end
 
   def stay
-    puts "You stayed at #{total(cards)}."
+    puts "You stayed at #{total}."
   end
 end
 
@@ -83,7 +83,7 @@ class Dealer < Participant
   end
 
   def stay
-    puts "Dealer stayed at #{total(cards)}."
+    puts "Dealer stayed at #{total}."
   end
 end
 
@@ -210,7 +210,7 @@ class Game
     puts "Now it's the dealer's turn..."
 
     loop do
-      break if dealer.total(dealer.cards) >= 17
+      break if dealer.total >= 17
       dealer.hit(deck)
     end
 
@@ -218,11 +218,11 @@ class Game
   end
 
   def player_final_score
-    player.total(player.cards)
+    player.total
   end
 
   def dealer_final_score
-    dealer.total(dealer.cards)
+    dealer.total
   end
 
   def display_result
