@@ -238,7 +238,7 @@ class Game
   end
 
   def setup_round
-    shuffle_deck
+    display_shuffle_deck_message
     deal_initial_cards
     display_score
     display_initial_cards
@@ -268,7 +268,7 @@ class Game
     end
   end
 
-  def shuffle_deck
+  def display_shuffle_deck_message
     print "Shuffling the deck... "
     display_spinner
     puts ''
