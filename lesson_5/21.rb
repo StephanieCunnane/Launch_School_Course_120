@@ -2,12 +2,13 @@ module Hand
   BLACKJACK = 21
 
   def display_hand
-    puts "#{referred_to_as} cards: "
+    puts "#{referred_to_as} current cards:"
+    puts '-------------------'
     cards.each do |card|
-      puts " - #{card}"
+      puts "  |#{card} |"
     end
     puts ''
-    puts "Hand total: #{total}"
+    puts "#{referred_to_as} hand total: #{total}"
     puts ''
   end
 
@@ -57,11 +58,14 @@ class Player < Participant
 
   def hit!(deck)
     cards << deck.deal_card
-    puts 'You chose to hit!'
+    puts ''
+    puts 'Alright, you chose to hit...'
+    puts ''
     display_hand
   end
 
   def stay
+    puts ''
     puts "You stayed at #{total}."
   end
 
@@ -96,25 +100,33 @@ class Dealer < Participant
   end
 
   def display_initial_hand
-    puts "Dealer's cards: "
-    puts " - #{cards[0]}"
-    puts ' - ?'
+    puts "Dealer's cards:"
+    puts '---------------'
+    puts "  |#{cards[0]} |"
+    puts '  |??|'
     puts ''
   end
 
   def hit!(deck)
     cards << deck.deal_card
+    puts ''
+    sleep(2)
     puts 'Dealer hits!'
     display_hand
   end
 
   def stay
+    puts ''
     puts "Dealer stayed at #{total}."
+    puts ''
   end
 
   def take_turn(deck)
     puts ''
-    puts "Now it's the dealer's turn..."
+    puts '###################################################'
+    puts ''
+    puts "Ok, now it's the dealer's turn..."
+    puts ''
 
     loop do
       break if total >= DEALER_MIN_SCORE
@@ -154,10 +166,10 @@ class Card
 
   def suit
     case @suit
-    when 'H' then 'Hearts'
-    when 'D' then 'Diamonds'
-    when 'S' then 'Spades'
-    when 'C' then 'Clubs'
+    when 'H' then '♥'
+    when 'D' then '♦'
+    when 'S' then '♠'
+    when 'C' then '♣'
     end
   end
 
@@ -178,6 +190,7 @@ end
 
 class Game
   WINNING_SCORE = 5
+  SCOREBOARD_WIDTH = 49
 
   attr_accessor :deck
   attr_reader :player, :dealer
@@ -204,14 +217,14 @@ class Game
   private
 
   def display_welcome_message
-    puts '***************************************************'
+    puts '###################################################'
     puts ''
     puts 'Hello and welcome to 21!'
     puts "The first player to #{WINNING_SCORE} points is the overall winner."
     puts "Let's see if you can beat the dealer!"
     puts 'Good luck!!'
     puts ''
-    puts '***************************************************'
+    puts '###################################################'
     puts ''
     sleep(3.5)
   end
@@ -271,10 +284,10 @@ class Game
 
   def display_score
     clear_screen
-    puts '##### Current score #####'
-    puts "You: #{player.score}"
-    puts "Dealer: #{dealer.score}"
-    puts '#########################'
+    puts '################## Current Score ##################'
+    puts "#" + "You: #{player.score}".center(SCOREBOARD_WIDTH) + "#"
+    puts "#" + "Dealer: #{dealer.score}".center(SCOREBOARD_WIDTH) + "#"
+    puts '###################################################'
     puts ''
   end
 
@@ -311,9 +324,9 @@ class Game
     case result
     when :player_busted then puts 'Player busted -> Dealer wins!'
     when :dealer_busted then puts 'Dealer busted -> Player wins!'
-    when :player then puts 'Player is the winner!!'
-    when :dealer then puts 'Dealer is the winner!!'
-    else puts "It's a tie!"
+    when :player then puts 'Player wins the round!!'
+    when :dealer then puts 'Dealer wins the round!!'
+    else puts "The round is a tie!"
     end
   end
 
@@ -322,13 +335,21 @@ class Game
   end
 
   def display_game_result
-    puts "And we have a winner!"
+    game_winner = player.score > dealer.score ? "You're" : "The dealer is"
+    puts "#{game_winner} the overall winner - congratulations!!"
   end
 
   def play_again?
-    puts '-------------'
-    puts 'Do you want to play again? (y or n)'
-    answer = gets.chomp.downcase
+    puts ''
+    puts '###################################################'
+    puts ''
+    answer = nil
+    loop do
+      puts 'Do you want to play again? (y or n)'
+      answer = gets.chomp.downcase
+      break if %w(y yes n no).include?(answer)
+      puts 'Invalid response, please answer y or n.'
+    end
     answer == 'y' || answer == 'yes'
   end
 
