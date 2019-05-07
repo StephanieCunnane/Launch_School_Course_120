@@ -2,6 +2,7 @@ module Hand
   BLACKJACK = 21
 
   def display_hand
+    puts ''
     puts "#{referred_to_as} current cards:"
     puts '-------------------'
     cards.each do |card|
@@ -14,6 +15,10 @@ module Hand
 
   def busted?
     total > BLACKJACK
+  end
+
+  def blackjack?
+    total == BLACKJACK
   end
 
   def total
@@ -82,6 +87,7 @@ class Player < Participant
 
   def take_turn(deck)
     loop do
+      return if blackjack?
       choice = choose_hit_or_stay
       hit!(deck) if %w(h hit).include?(choice)
       break if %w(s stay).include?(choice) || busted?
@@ -117,8 +123,10 @@ class Dealer < Participant
 
   def stay
     puts ''
-    puts "Dealer stayed at #{total}."
+    sleep(2)
+    puts "Dealer stayed."
     puts ''
+    display_hand
   end
 
   def take_turn(deck)
@@ -189,7 +197,7 @@ class Card
 end
 
 class Game
-  WINNING_SCORE = 5
+  WINNING_SCORE = 3
   SCOREBOARD_WIDTH = 49
 
   attr_accessor :deck
@@ -230,21 +238,22 @@ class Game
   end
 
   def setup_round
-    shuffle_the_deck
+    shuffle_deck
     deal_initial_cards
     display_score
     display_initial_cards
   end
 
   def add_point
-    player.score += 1 if [:player, :dealer_busted].include?(round_result)
-    dealer.score += 1 if [:dealer, :player_busted].include?(round_result)
+    result = round_result
+    player.score += 1 if [:player, :dealer_busted].include?(result)
+    dealer.score += 1 if [:dealer, :player_busted].include?(result)
   end
 
   def play_round
     setup_round
     player.take_turn(deck)
-    dealer.take_turn(deck) unless player.busted?
+    dealer.take_turn(deck) unless player.busted? || player.blackjack?
     add_point
     display_round_result
   end
@@ -259,7 +268,7 @@ class Game
     end
   end
 
-  def shuffle_the_deck
+  def shuffle_deck
     print "Shuffling the deck... "
     display_spinner
     puts ''
@@ -288,7 +297,6 @@ class Game
     puts "#" + "You: #{player.score}".center(SCOREBOARD_WIDTH) + "#"
     puts "#" + "Dealer: #{dealer.score}".center(SCOREBOARD_WIDTH) + "#"
     puts '###################################################'
-    puts ''
   end
 
   def display_initial_cards
@@ -319,9 +327,7 @@ class Game
   end
 
   def display_round_result
-    result = round_result
-
-    case result
+    case round_result
     when :player_busted then puts 'Player busted -> Dealer wins!'
     when :dealer_busted then puts 'Dealer busted -> Player wins!'
     when :player then puts 'Player wins the round!!'
@@ -335,8 +341,8 @@ class Game
   end
 
   def display_game_result
-    game_winner = player.score > dealer.score ? "You're" : "The dealer is"
-    puts "#{game_winner} the overall winner - congratulations!!"
+    game_winner = player.score > dealer.score ? "you're" : "the dealer is"
+    puts "And #{game_winner} the overall winner - congratulations!!"
   end
 
   def play_again?
