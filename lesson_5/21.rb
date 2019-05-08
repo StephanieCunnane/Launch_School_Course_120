@@ -1,5 +1,9 @@
-module Hand
-  BLACKJACK = 21
+module Displayable
+  SCOREBOARD_WIDTH = 49
+
+  def clear_screen
+    system('clear') || system('cls')
+  end
 
   def display_hand
     puts ''
@@ -12,6 +16,98 @@ module Hand
     puts "#{referred_to_as} hand total: #{total}"
     puts ''
   end
+
+  def display_initial_hand
+    puts "Dealer's cards:"
+    puts '---------------'
+    puts "  |#{cards[0]} |"
+    puts '  |??|'
+    puts ''
+  end
+
+  def display_dealer_turn_message
+    puts ''
+    puts '###################################################'
+    puts ''
+    puts "Ok, now it's the dealer's turn..."
+    puts ''
+  end
+
+  def display_welcome_message
+    puts '###################################################'
+    puts ''
+    puts 'Hello and welcome to 21!'
+    puts "The first player to #{Game::WINNING_SCORE} " \
+         "points is the overall winner."
+    puts "Let's see if you can beat the dealer!"
+    puts 'Good luck!!'
+    puts ''
+    puts '###################################################'
+    puts ''
+    sleep(3.5)
+  end
+
+  def display_spinner
+    5.times do
+      ["-", "\\", "|", "/"].each do |symbol|
+        print symbol
+        sleep(0.065)
+        print "\b"
+      end
+    end
+  end
+
+  def display_shuffle_deck_message
+    print "Shuffling the deck... "
+    display_spinner
+    puts ''
+    puts ''
+  end
+
+  def display_dealing_cards_message
+    print "Dealing the cards... "
+    display_spinner
+    puts ''
+    puts ''
+  end
+
+  def display_score
+    clear_screen
+    puts '################## Current Score ##################'
+    puts "#" + "You: #{player.score}".center(SCOREBOARD_WIDTH) + "#"
+    puts "#" + "Dealer: #{dealer.score}".center(SCOREBOARD_WIDTH) + "#"
+    puts '###################################################'
+  end
+
+  def display_initial_cards
+    player.display_hand
+    dealer.display_initial_hand
+  end
+
+  def display_round_result
+    case round_result
+    when :player_busted then puts 'Player busted -> Dealer wins!'
+    when :dealer_busted then puts 'Dealer busted -> Player wins!'
+    when :player then puts 'Player wins the round!!'
+    when :dealer then puts 'Dealer wins the round!!'
+    else puts "The round is a tie!"
+    end
+  end
+
+  def display_game_result
+    game_winner = player.score > dealer.score ? "you're" : "the dealer is"
+    puts "And #{game_winner} the overall winner - congratulations!!"
+  end
+
+  def display_goodbye_message
+    puts ""
+    puts "That's enough 21 for now!"
+    puts 'Thanks for playing! Goodbye!'
+  end
+end
+
+module Hand
+  BLACKJACK = 21
 
   def busted?
     total > BLACKJACK
@@ -35,15 +131,14 @@ module Hand
              end
     end
 
-    values.count('Ace').times do
-      sum -= 10 if sum > BLACKJACK
-    end
+    values.count('Ace').times { sum -= 10 if sum > BLACKJACK }
 
     sum
   end
 end
 
 class Participant
+  include Displayable
   include Hand
 
   attr_accessor :cards, :score
@@ -61,12 +156,33 @@ class Player < Participant
     super
   end
 
+  def take_turn(deck)
+    loop do
+      return if blackjack?
+      choice = choose_hit_or_stay
+      hit!(deck) if hit?(choice)
+      display_hand
+      break if stay?(choice) || busted?
+    end
+
+    stay unless busted?
+  end
+
+  private
+
+  def hit?(choice)
+    %w(h hit).include?(choice)
+  end
+
+  def stay?(choice)
+    %w(s stay).include?(choice)
+  end
+
   def hit!(deck)
     cards << deck.deal_card
     puts ''
     puts 'Alright, you chose to hit...'
     puts ''
-    display_hand
   end
 
   def stay
@@ -79,21 +195,10 @@ class Player < Participant
     loop do
       puts 'Would you like to (h)it or (s)tay?'
       choice = gets.chomp.downcase
-      break if %w(h hit s stay).include?(choice)
+      break if hit?(choice) || stay?(choice)
       puts "Sorry, must enter 'h'or 's'."
     end
     choice
-  end
-
-  def take_turn(deck)
-    loop do
-      return if blackjack?
-      choice = choose_hit_or_stay
-      hit!(deck) if %w(h hit).include?(choice)
-      break if %w(s stay).include?(choice) || busted?
-    end
-
-    stay unless busted?
   end
 end
 
@@ -105,20 +210,26 @@ class Dealer < Participant
     super
   end
 
-  def display_initial_hand
-    puts "Dealer's cards:"
-    puts '---------------'
-    puts "  |#{cards[0]} |"
-    puts '  |??|'
-    puts ''
+  def take_turn(deck)
+    display_dealer_turn_message
+
+    loop do
+      break if total >= DEALER_MIN_SCORE
+      hit!(deck)
+      display_hand
+    end
+
+    stay unless busted?
+    display_hand unless busted?
   end
+
+  private
 
   def hit!(deck)
     cards << deck.deal_card
     puts ''
     sleep(2)
     puts 'Dealer hits!'
-    display_hand
   end
 
   def stay
@@ -126,22 +237,6 @@ class Dealer < Participant
     sleep(2)
     puts "Dealer stayed."
     puts ''
-    display_hand
-  end
-
-  def take_turn(deck)
-    puts ''
-    puts '###################################################'
-    puts ''
-    puts "Ok, now it's the dealer's turn..."
-    puts ''
-
-    loop do
-      break if total >= DEALER_MIN_SCORE
-      hit!(deck)
-    end
-
-    stay unless busted?
   end
 end
 
@@ -197,8 +292,9 @@ class Card
 end
 
 class Game
+  include Displayable
+
   WINNING_SCORE = 3
-  SCOREBOARD_WIDTH = 49
 
   attr_accessor :deck
   attr_reader :player, :dealer
@@ -224,19 +320,6 @@ class Game
 
   private
 
-  def display_welcome_message
-    puts '###################################################'
-    puts ''
-    puts 'Hello and welcome to 21!'
-    puts "The first player to #{WINNING_SCORE} points is the overall winner."
-    puts "Let's see if you can beat the dealer!"
-    puts 'Good luck!!'
-    puts ''
-    puts '###################################################'
-    puts ''
-    sleep(3.5)
-  end
-
   def setup_round
     display_shuffle_deck_message
     deal_initial_cards
@@ -258,30 +341,6 @@ class Game
     display_round_result
   end
 
-  def display_spinner
-    5.times do
-      ["-", "\\", "|", "/"].each do |symbol|
-        print symbol
-        sleep(0.065)
-        print "\b"
-      end
-    end
-  end
-
-  def display_shuffle_deck_message
-    print "Shuffling the deck... "
-    display_spinner
-    puts ''
-    puts ''
-  end
-
-  def display_dealing_cards_message
-    print "Dealing the cards... "
-    display_spinner
-    puts ''
-    puts ''
-  end
-
   def deal_initial_cards
     display_dealing_cards_message
 
@@ -289,19 +348,6 @@ class Game
       player.cards << deck.deal_card
       dealer.cards << deck.deal_card
     end
-  end
-
-  def display_score
-    clear_screen
-    puts '################## Current Score ##################'
-    puts "#" + "You: #{player.score}".center(SCOREBOARD_WIDTH) + "#"
-    puts "#" + "Dealer: #{dealer.score}".center(SCOREBOARD_WIDTH) + "#"
-    puts '###################################################'
-  end
-
-  def display_initial_cards
-    player.display_hand
-    dealer.display_initial_hand
   end
 
   def player_round_score
@@ -326,23 +372,8 @@ class Game
     end
   end
 
-  def display_round_result
-    case round_result
-    when :player_busted then puts 'Player busted -> Dealer wins!'
-    when :dealer_busted then puts 'Dealer busted -> Player wins!'
-    when :player then puts 'Player wins the round!!'
-    when :dealer then puts 'Dealer wins the round!!'
-    else puts "The round is a tie!"
-    end
-  end
-
   def someone_won?
     player.score == WINNING_SCORE || dealer.score == WINNING_SCORE
-  end
-
-  def display_game_result
-    game_winner = player.score > dealer.score ? "you're" : "the dealer is"
-    puts "And #{game_winner} the overall winner - congratulations!!"
   end
 
   def play_again?
@@ -359,21 +390,11 @@ class Game
     answer == 'y' || answer == 'yes'
   end
 
-  def clear_screen
-    system('clear') || system('cls')
-  end
-
   def reset
     clear_screen
     player.cards = []
     dealer.cards = []
     self.deck = Deck.new
-  end
-
-  def display_goodbye_message
-    puts ""
-    puts "That's enough 21 for now!"
-    puts 'Thanks for playing! Goodbye!'
   end
 end
 
