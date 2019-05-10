@@ -1,24 +1,24 @@
 class Deck
   RANKS = ((2..10).to_a + %w(Jack Queen King Ace)).freeze
   SUITS = %w(Hearts Clubs Diamonds Spades).freeze
-  
+
   attr_reader :cards
-  
+
   def initialize
     reset
   end
-  
+
   def draw
     reset if cards.empty?
     cards.pop
   end
-  
+
   private
-  
+
   def reset
     @cards = build_deck
   end
-  
+
   def build_deck
     combos = RANKS.product(SUITS)
     combos.map! { |rank, suit| Card.new(rank, suit) }
@@ -28,20 +28,20 @@ end
 
 class Card
   RANKS = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace)
-  
+
   include Comparable
-  
+
   attr_reader :rank, :suit
-  
+
   def initialize(rank, suit)
     @rank = rank
     @suit = suit
   end
-  
+
   def <=>(other_card)
     RANKS.index(rank.to_s) <=> RANKS.index(other_card.rank.to_s)
   end
-  
+
   def to_s
     "#{rank} of #{suit}"
   end
@@ -49,16 +49,16 @@ end
 
 class PokerHand
   attr_reader :deck, :hand
-  
+
   def initialize(deck)
     @deck = deck
     @hand = build_hand
   end
-  
+
   def print
     puts hand
   end
-  
+
   def evaluate
     case
     when royal_flush?     then 'Royal flush'
@@ -73,79 +73,205 @@ class PokerHand
     else                       'High card'
     end
   end
-      
+
   private
-      
+
   def build_hand
     hand = []
     5.times { hand << deck.draw }
     hand
   end
-      
+
   def all_one_suit?
     hand.map(&:suit).uniq.size == 1
   end
-      
+
   def ranks_in_sequence?
     sorted_ranks = hand.sort
     Card::RANKS.join.include?(sorted_ranks.map(&:rank).join)
   end
-      
+
   def n_of_a_kind(n)
     sorted_ranks = hand.map(&:rank).sort_by { |rank| Card::RANKS.index(rank.to_s) }
     sorted_ranks.chunk_while { |a, b| a == b }.map(&:size).max == n
   end
-      
+
   def royal_flush?
     royal_flush_ranks = hand.sort.map(&:rank).join == "10JackQueenKingAce"
     royal_flush_ranks && all_one_suit?
   end
-      
+
   def straight_flush?
     ranks_in_sequence? && all_one_suit?
   end
-      
+
   def four_of_a_kind?
     n_of_a_kind(4)
   end
-      
+
   def full_house?
     ranks = hand.sort.map(&:rank).chunk_while { |a, b| a == b }.to_a
     ranks.one? { |elem| elem.size == 3 } && ranks.one? { |elem| elem.size == 2 }
   end
-      
+
   def flush?
     all_one_suit? && !ranks_in_sequence?
   end
-    
+
   # high-Ace straignt only, not low-Ace straight
   def straight?
     ranks_in_sequence? && !all_one_suit?
   end
-      
+
   def three_of_a_kind?
     n_of_a_kind(3)
   end
-     
+
   def two_pair?
     sorted_ranks = hand.map(&:rank).sort_by { |rank| Card::RANKS.index(rank.to_s) }
     sorted_ranks.chunk_while { |a, b| a == b }.map(&:size).max(2).all? { |count| count == 2 }
   end
-      
+
   def pair?
     n_of_a_kind(2) && !two_pair?
   end
 end
-      
+
+##################################################################################################3
+# Given solution
+
+class Card
+  include Comparable
+  attr_reader :rank, :suit
+
+  VALUES = { 'Jack' => 11, 'Queen' => 12, 'King' => 13, 'Ace' => 14 }
+
+  def initialize(rank, suit)
+    @rank = rank
+    @suit = suit
+  end
+
+  def to_s
+    "#{rank} of #{suit}"
+  end
+
+  def value
+    VALUES.fetch(@rank, @rank)
+  end
+
+  def <=>(other_card)
+    value <=> other_card.value
+  end
+end
+
+class Deck
+  RANKS = ((2..10).to_a + %w(Jack Queen King Ace)).freeze
+  SUITS = %w(Hearts Clubs Diamonds Spades).freeze
+
+  def initialize
+    reset
+  end
+
+  def draw
+    reset if @deck.empty?
+    @deck.pop
+  end
+
+  private
+
+  def reset
+    @deck = RANKS.product(SUITS).map do |rank, suit|
+      Card.new(rank, suit)
+    end
+
+    @deck.shuffle!
+  end
+end
+
+class PokerHand
+  def initialize(cards)
+    @cards = []
+    @rank_count = Hash.new(0)
+
+    5.times do
+      card = cards.draw
+      @cards << card
+      @rank_count[card.rank] += 1
+    end
+  end
+
+  def print
+    puts @cards
+  end
+
+  def evaluate
+    if    royal_flush?     then 'Royal flush'
+    elsif straight_flush?  then 'Straight flush'
+    elsif four_of_a_kind?  then 'Four of a kind'
+    elsif full_house?      then 'Full house'
+    elsif flush?           then 'Flush'
+    elsif straight?        then 'Straight'
+    elsif three_of_a_kind? then 'Three of a kind'
+    elsif two_pair?        then 'Two pair'
+    elsif pair?            then 'Pair'
+    else 'High card'
+    end
+  end
+
+  private
+
+  def flush?
+    suit = @cards.first.suit
+    @cards.all? { |card| card.suit == suit }
+  end
+
+  def straight?
+    return false if @rank_count.any? { |_rank, count| count > 1 }
+    @cards.min.value == @cards.max.value - 4
+  end
+
+  def n_of_a_kind?(n)
+    @rank_count.one? { |_rank, count| count == n }
+  end
+
+  def straight_flush?
+    flush? && straight?
+  end
+
+  def royal_flush?
+    straight_flush? && @cards.min.rank == 10
+  end
+
+  def four_of_a_kind?
+    n_of_a_kind?(4)
+  end
+
+  def full_house?
+    n_of_a_kind?(3) && n_of_a_kind?(2)
+  end
+
+  def three_of_a_kind?
+    n_of_a_kind?(3)
+  end
+
+  def two_pair?
+    @rank_count.select { |_rank, count| count == 2 }.size == 2
+  end
+
+  def pair?
+    n_of_a_kind?(2)
+  end
+end
+
 # Dangerous monkey-patching for testing purposes only
 class Array
   alias_method :draw, :pop
 end
-      
+
 hand = PokerHand.new(Deck.new)
 hand.print
 puts hand.evaluate
-      
+
 hand = PokerHand.new([
   Card.new(10,      'Hearts'),
   Card.new('Ace',   'Hearts'),
