@@ -72,6 +72,56 @@ shelter.print_adoptions
 puts "#{phanson.name} has #{phanson.number_of_pets} adopted pets."
 puts "#{bholmes.name} has #{bholmes.number_of_pets} adopted pets."
 
+# Different implementation
+
+class Shelter
+  def initialize
+    @adoptions_database = {}
+  end
+
+  def adopt(owner, pet)
+    if @adoptions_database[owner.name]
+      @adoptions_database[owner.name] << pet.to_s
+    else
+      @adoptions_database[owner.name] = [pet.to_s]
+    end
+
+    owner.adopted_pet_count += 1
+  end
+
+  def print_adoptions
+    @adoptions_database.each do |owner, pet_list|
+      puts "#{owner} has adopted the following pets:"
+      pet_list.each { |pet| puts pet }
+      puts
+    end
+  end
+end
+
+class Pet
+  def initialize(pet_type, name)
+    @pet_type = pet_type
+    @name = name
+  end
+
+  def to_s
+    "a #{@pet_type} named #{@name}"
+  end
+end
+
+class Owner
+  attr_reader :name
+  attr_accessor :adopted_pet_count
+
+  def initialize(name)
+    @name = name
+    @adopted_pet_count = 0
+  end
+
+  def number_of_pets
+    @adopted_pet_count
+  end
+end
 
 #######################################################################
 # Further Exploration
