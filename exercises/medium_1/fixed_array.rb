@@ -14,7 +14,7 @@ class FixedArray
   end
   
   # the receiver is requesting an Array version of itself (the FixedArray instance, self)
-  # But this methos is passing back a REFERENCE to the original Array object stored in @arr.
+  # But this method is passing back a REFERENCE to the original Array object stored in @arr.
   # So with the reference, destructive things can happen the the main data structure of our FixedArray instance -> use #clone
   def to_a
     arr.clone
@@ -27,6 +27,36 @@ class FixedArray
   private
   
   attr_reader :arr
+end
+
+# With improved input validation in #[]=
+
+class FixedArray
+  def initialize(size)
+    @size = size
+    @fixed_array = Array.new(size)
+  end
+
+  def [](idx)
+    fixed_array.fetch(idx)
+  end
+
+  def []=(idx, elem)
+    raise IndexError unless (-@size...@size).include?(idx)
+    fixed_array[idx] = elem
+  end
+
+  def to_s
+    fixed_array.to_s
+  end
+
+  def to_a
+    fixed_array.clone
+  end
+
+  private
+
+  attr_reader :fixed_array
 end
 
 # Given solution
