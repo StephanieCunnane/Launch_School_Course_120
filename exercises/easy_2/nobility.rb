@@ -69,6 +69,73 @@ p flash.walk
 noble = Noble.new("Byron", "Lord")
 p noble.walk
 
+# Cleaner implementation
+module Walkable
+  def walk
+    "#{name} #{gait} forward"
+  end
+end
+
+class Person
+  include Walkable
+  
+  attr_reader :name
+  
+  def initialize(name)
+    @name = name
+  end
+  
+  private
+  
+  def gait
+    'strolls'
+  end
+end
+
+class Noble < Person
+  attr_reader :title
+  
+  def initialize(name, title)
+    super(name)
+    @title = title
+  end
+  
+  def walk
+    "#{title} " + super
+  end
+  
+  private
+  
+  def gait
+    'struts'
+  end
+end
+
+class Cat
+  include Walkable
+  
+  attr_reader :name
+  
+  def initialize(name)
+    @name = name
+  end
+  
+  private
+  
+  def gait
+    'saunters'
+  end
+end
+
+class Cheetah < Cat
+  private
+  
+  def gait
+    'runs'
+  end
+end
+
+
 # Given solution
 module Walkable
   def walk
