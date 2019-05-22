@@ -7,7 +7,7 @@ class CircularQueue
   
   def enqueue(obj)
     unless @buffer[@next_position].nil?
-      @oldest_position = increment(@oldest_position)
+      @oldest_position = increment(@next_position)
     end
     
     @buffer[@next_position] = obj
@@ -25,6 +25,34 @@ class CircularQueue
   
   def increment(position)
     (position + 1) % @buffer.size
+  end
+end
+
+# Further exploration
+
+# [newest, middle, oldest]
+# Or think of it as a spectrum: oldest at the end, newest at the front
+
+class CircularQueue
+  def initialize(size)
+    @buffer = Array.new(size)
+  end
+
+  def enqueue(obj)
+    @buffer.pop
+    @buffer.unshift(obj)
+  end
+
+  def dequeue
+    dequeued = nil
+    (@buffer.size - 1).downto(0) do |idx|
+      unless @buffer[idx].nil?
+        dequeued = @buffer[idx]
+        @buffer[idx] = nil
+        return dequeued
+      end
+    end
+    dequeued
   end
 end
 
