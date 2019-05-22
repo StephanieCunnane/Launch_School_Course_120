@@ -79,6 +79,7 @@ game.play
 class GuessingGame
   def initialize
     @secret_num = rand(1..100)
+    @guess = nil
     @guesses_remaining = 7
   end
 
