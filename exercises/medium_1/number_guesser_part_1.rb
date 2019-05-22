@@ -32,7 +32,7 @@ class GuessingGame
     if @guesses_remaining == 1
       puts "You have 1 guess remaining."
     else
-      puts "You have #{guesses_remaining} remaining."
+      puts "You have #{@guesses_remaining} remaining."
     end
   end
 
@@ -68,6 +68,78 @@ class GuessingGame
 
   def display_result
     puts(player_won? ? "You won!" : "You have no more guesses. You lost!")
+  end
+end
+
+game = GuessingGame.new
+game.play
+
+# Second implementation
+
+class GuessingGame
+  def initialize
+    @secret_num = rand(1..100)
+    @guesses_remaining = 7
+  end
+
+  def play
+    display_welcome_message
+    loop do
+      display_guesses_remaining
+      obtain_player_guess
+      display_guess_result
+      decrement_guesses_remaining
+      break if player_won? || @guesses_remaining.zero?
+    end
+    display_game_result
+  end
+
+  private
+
+  def decrement_guesses_remaining
+    @guesses_remaining -= 1
+  end
+
+  def display_game_result
+    if player_won?
+      puts 'You won!'
+    else
+      puts 'You have no more guesses. You lost!'
+    end
+  end
+
+  def display_guess_result
+    case @guess
+    when @secret_num then puts "That's the number!"
+    when (1...@secret_num) then puts 'Your guess is too low.'
+    else
+      puts 'Your guess is too high.'
+    end
+  end
+
+  def display_guesses_remaining
+    pluralized = @guesses_remaining > 1 ? 'guesses' : 'guess'
+    puts "You have #{@guesses_remaining} #{pluralized} remaining."
+  end
+
+  def display_welcome_message
+    puts "Welcome to the Number Guessing Game!"
+    puts
+  end
+
+  def obtain_player_guess
+    guess = nil
+    loop do
+      print "Enter a number between 1 and 100 (inclusive): "
+      guess = gets.chomp.to_i
+      break if guess.between?(1, 100)
+      puts "Sorry, invalid input."
+    end
+    @guess = guess
+  end
+
+  def player_won?
+    @guess == @secret_num
   end
 end
 
