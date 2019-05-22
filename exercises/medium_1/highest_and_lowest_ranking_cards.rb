@@ -109,3 +109,51 @@ cards = [Card.new(8, 'Diamonds'),
          Card.new(8, 'Spades')]
 puts cards.min.rank == 8
 puts cards.max.rank == 8
+
+# Further Exploration
+
+class Card
+  include Comparable
+
+  RELATIVE_RANKS = {
+    1  => 2,
+    2  => 3,
+    3  => 4,
+    4  => 5,
+    5  => 6,
+    6  => 7,
+    7  => 8,
+    8  => 9,
+    9  => 10,
+    10 => 'Jack',
+    11 => 'Queen',
+    12 => 'King',
+    13 => 'Ace'
+  }.freeze
+
+  RELATIVE_SUITS = %w(Diamonds Clubs Hearts Spades).freeze
+
+  attr_reader :rank, :suit
+
+  def initialize(rank, suit)
+    @rank = rank
+    @suit = suit
+  end
+
+  def compare_suits(other_card)
+    RELATIVE_SUITS.index(suit) < RELATIVE_SUITS.index(other_card.suit) ? -1 : 1
+  end
+
+  def <=>(other_card)
+    rank_cmp = RELATIVE_RANKS.key(rank) <=> RELATIVE_RANKS.key(other_card.rank)
+    rank_cmp.zero? ? compare_suits(other_card) : rank_cmp
+  end
+
+  def ==(other_card)
+    rank == other_card.rank
+  end
+
+  def to_s
+    "#{rank} of #{suit}"
+  end
+end
