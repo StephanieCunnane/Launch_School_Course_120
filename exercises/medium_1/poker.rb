@@ -137,6 +137,150 @@ class PokerHand
   end
 end
 
+# Improved implementation
+##########################################################################
+
+class Deck
+  RANKS = ((2..10).to_a + %w(Jack Queen King Ace)).freeze
+  SUITS = %w(Hearts Clubs Diamonds Spades).freeze
+
+  def initialize
+    @cards = nil
+    reset_deck
+  end
+
+  def draw
+    reset_deck if @cards.empty?
+    @cards.pop
+  end
+
+  private
+
+  def reset_deck
+    combos = RANKS.product(SUITS)
+    combos.map! { |rank, suit| Card.new(rank, suit) }
+    @cards = combos.shuffle
+  end
+end
+
+class Card
+  include Comparable
+
+  RELATIVE_RANKS = {
+    1  => 2,
+    2  => 3,
+    3  => 4,
+    4  => 5,
+    5  => 6,
+    6  => 7,
+    7  => 8,
+    8  => 9,
+    9  => 10,
+    10 => 'Jack',
+    11 => 'Queen',
+    12 => 'King',
+    13 => 'Ace'
+  }.freeze
+
+  attr_reader :rank, :suit
+
+  def initialize(rank, suit)
+    @rank = rank
+    @suit = suit
+  end
+
+  def <=>(other_card)
+    RELATIVE_RANKS.key(rank) <=> RELATIVE_RANKS.key(other_card.rank)
+  end
+
+  def to_s
+    "#{rank} of #{suit}"
+  end
+end
+
+class PokerHand
+  def initialize(deck)
+    @deck = deck
+    @hand = deal_new_hand
+    @ranks_count = count_ranks
+  end
+
+  def print
+    puts @hand
+  end
+
+  def evaluate
+    case
+    when royal_flush?     then 'Royal flush'
+    when straight_flush?  then 'Straight flush'
+    when four_of_a_kind?  then 'Four of a kind'
+    when full_house?      then 'Full house'
+    when flush?           then 'Flush'
+    when straight?        then 'Straight'
+    when three_of_a_kind? then 'Three of a kind'
+    when two_pair?        then 'Two pair'
+    when pair?            then 'Pair'
+    else                       'High card'
+    end
+  end
+
+  private
+
+  def deal_new_hand
+    hand = []
+    5.times { hand << @deck.draw }
+    hand
+  end
+
+  def count_ranks
+    ranks_count = Hash.new(0)
+    @hand.each { |card| ranks_count[card.rank] += 1 }
+    ranks_count
+  end
+
+  def n_of_a_kind(n)
+    @ranks_count.values.include?(n)
+  end
+
+  def royal_flush?
+    ranks = @hand.map { |card| Card::RELATIVE_RANKS.key(card.rank) }
+    straight_flush? && (ranks.min == 9)
+  end
+
+  def straight_flush?
+    straight? && flush?
+  end
+
+  def four_of_a_kind?
+    n_of_a_kind(4)
+  end
+
+  def full_house?
+    three_of_a_kind? && pair?
+  end
+
+  def flush?
+    @hand.map(&:suit).uniq.size == 1
+  end
+
+  def straight?
+    ranks = @hand.map { |card| Card::RELATIVE_RANKS.key(card.rank) }
+    ranks.uniq.size == 5 && (ranks.max - ranks.min == 4)
+  end
+
+  def three_of_a_kind?
+    n_of_a_kind(3)
+  end
+
+  def two_pair?
+    @ranks_count.values.count(2) == 2
+  end
+
+  def pair?
+    @ranks_count.values.count(2) == 1
+  end
+end
+
 ##################################################################################################3
 # Given solution
 
