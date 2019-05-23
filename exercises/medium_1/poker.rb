@@ -527,3 +527,9 @@ PokerHand.new(cards).royal_flush?
 
 # I'm just creating a new instance of a PokerHand using the array of Cards that the client passed in to the class method invocation, then calling the appropriate instance method
 
+# How would you modify our original solution to choose the best hand between 2 poker hands?
+
+# Assign a numeric value to a given hand, then compare the 2 numbers
+# Or put the different hands in an array, lowest hand at idx 0 and highest hand at idx -1. Then compare the indexes of the 2 hands.
+# To implement this, @hand_value can be an instance variable and we can use a protected method to compare the @hand_value instance variables for 2 different PokerHand objects.
+
