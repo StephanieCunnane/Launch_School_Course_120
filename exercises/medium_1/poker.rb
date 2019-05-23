@@ -533,3 +533,6 @@ PokerHand.new(cards).royal_flush?
 # Or put the different hands in an array, lowest hand at idx 0 and highest hand at idx -1. Then compare the indexes of the 2 hands.
 # To implement this, @hand_value can be an instance variable and we can use a protected method to compare the @hand_value instance variables for 2 different PokerHand objects.
 
+# How would you modify our original solution to choose the best 5-card hand from a 7-card poker hand?
+
+# Assuming we have implemented functionality to give a numeric score to a poker hand, we can use call Array#combination(5) on an array of our 7 cards to get all possible hands we can create from the 7 cards. Then iterate through the nested array that #combination returns using Enumerable#max_by and calling on our numeric score functionality within #max_by's block.
