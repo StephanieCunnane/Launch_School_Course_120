@@ -514,3 +514,16 @@ hand = PokerHand.new([
   Card.new(3,      'Diamonds')
 ])
 puts hand.evaluate == 'High card'
+
+# Further Exploration
+
+# How would you modify this class if you wanted the individual classification methods (royal_flush?, etc) to be public class methods that work with an array of 5 Cards?
+
+# Example class method call:
+def self.royal_flush?(cards)
+end
+
+PokerHand.new(cards).royal_flush?
+
+# I'm just creating a new instance of a PokerHand using the array of Cards that the client passed in to the class method invocation, then calling the appropriate instance method
+
