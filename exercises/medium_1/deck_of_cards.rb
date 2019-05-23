@@ -43,6 +43,65 @@ class Card
   end
 end
 
+# Improved implementation
+class Deck
+  RANKS = ((2..10).to_a + %w(Jack Queen King Ace)).freeze
+  SUITS = %w(Hearts Clubs Diamonds Spades).freeze
+  
+  def initialize
+    @cards = nil
+    reset_deck
+  end
+  
+  def draw
+    reset_deck if @cards.empty?
+    @cards.pop
+  end
+  
+  private
+  
+  def reset_deck
+    combos = RANKS.product(SUITS)
+    combos.map! { |rank, suit| Card.new(rank, suit) }
+    @cards = combos.shuffle
+  end
+end
+
+class Card
+  include Comparable
+
+  RELATIVE_RANKS = {
+    1  => 2,
+    2  => 3,
+    3  => 4,
+    4  => 5,
+    5  => 6,
+    6  => 7,
+    7  => 8,
+    8  => 9,
+    9  => 10,
+    10 => 'Jack',
+    11 => 'Queen',
+    12 => 'King',
+    13 => 'Ace'
+  }.freeze
+
+  attr_reader :rank, :suit
+
+  def initialize(rank, suit)
+    @rank = rank
+    @suit = suit
+  end
+
+  def <=>(other_card)
+    RELATIVE_RANKS.key(rank) <=> RELATIVE_RANKS.key(other_card.rank)
+  end
+
+  def to_s
+    "#{rank} of #{suit}"
+  end
+end
+
 # Given solution
 class Deck
   RANKS = ((2..10).to_a + %w(Jack Queen King Ace)).freeze
