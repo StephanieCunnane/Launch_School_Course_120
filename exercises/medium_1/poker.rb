@@ -238,7 +238,7 @@ class PokerHand
     ranks_count
   end
 
-  def n_of_a_kind(n)
+  def n_of_a_kind?(n)
     @ranks_count.values.include?(n)
   end
 
@@ -252,7 +252,7 @@ class PokerHand
   end
 
   def four_of_a_kind?
-    n_of_a_kind(4)
+    n_of_a_kind?(4)
   end
 
   def full_house?
@@ -269,7 +269,7 @@ class PokerHand
   end
 
   def three_of_a_kind?
-    n_of_a_kind(3)
+    n_of_a_kind?(3)
   end
 
   def two_pair?
