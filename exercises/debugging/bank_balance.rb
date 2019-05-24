@@ -42,3 +42,41 @@ p account.deposit(50)     # => $50 deposited. Total balance is $50.
 p account.balance         # => 50
 p account.withdraw(80)    # => Invalid. Enter positive amount less than or equal to current balance ($50).
 p account.balance         # => 50
+
+# More straightforward implementation of the BankAccount class
+
+class BankAccount
+  attr_reader :balance
+
+  def initialize(account_number, client)
+    @account_number = account_number
+    @client = client
+    @balance = 0
+  end
+
+  def deposit(amount)
+    if amount > 0
+      self.balance += amount
+      "$#{amount} deposited. Total balance is $#{balance}."
+    else
+      'Invalid. Enter a positive amount.'
+    end
+  end
+
+  def withdraw(amount)
+    if amount <= 0
+      return "Invalid. Enter positive amount less than or equal to current balance ($#{balance})."
+    end
+
+    if @balance - amount > 0
+      self.balance -= amount
+      "$#{amount} withdrawn. Total balance is $#{balance}."
+    else
+      "Invalid. Enter positive amount less than or equal to current balance ($#{balance})."
+    end
+  end
+
+  private
+
+  attr_writer :balance
+end
