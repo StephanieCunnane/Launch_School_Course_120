@@ -40,7 +40,8 @@ class TaskManager
   
   def display(tasks)
     puts "--------"
-    tasks.each { |task| puts task }
+    #tasks.each { |task| puts task }
+    puts tasks
     puts "--------"
   end
 end
@@ -68,3 +69,4 @@ valentinas_tasks.add_task('run 5k', :low)
 valentinas_tasks.complete_task('read OOP book')
   
 valentinas_tasks.display_all_tasks
+valentinas_tasks.display_high_priority_tasks
